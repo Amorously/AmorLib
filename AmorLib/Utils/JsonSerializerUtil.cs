@@ -1,0 +1,25 @@
+﻿using AmorLib.Dependencies;
+using System.Text.Json;
+using JsonSerializer = GTFO.API.JSON.JsonSerializer; // goes to GTFO-API NativeSerializer -> System.Text.Json.JsonSerializer
+
+namespace AmorLib.Utils;
+
+public static class JsonSerializerUtil
+{
+    /// <summary>
+    /// Creates a <see cref="JsonSerializerOptions"/> instance configured with the default serialization options.
+    /// </summary>
+    /// <returns>A default <see cref="JsonSerializerOptions"/> instance with the specified converters added.</returns>
+    public static JsonSerializerOptions CreateDefaultSettings(bool useLocalizedText = true, bool usePartialData = false, bool useInjectLib = false)
+    {
+        var setting = useLocalizedText ? JsonSerializer.DefaultSerializerSettingsWithLocalizedText : JsonSerializer.DefaultSerializerSettings;
+
+        if (usePartialData && PData_Wrapper.IsLoaded && PData_Wrapper.PersistentIDConverter != null)
+            setting.Converters.Add(PData_Wrapper.PersistentIDConverter);
+
+        if (useInjectLib && InjectLib_Wrapper.IsLoaded && InjectLib_Wrapper.InjectLibConverter != null)
+            setting.Converters.Add(InjectLib_Wrapper.InjectLibConverter);
+
+        return setting;
+    }
+}
