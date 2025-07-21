@@ -18,7 +18,7 @@ public struct LocaleText : IEquatable<LocaleText>
 
     public LocaleText(string text)
     {
-        if (PData_Wrapper.IsMainBranch && PData_Wrapper.TryGetGUID(text, out uint guid))
+        if (PData_Wrapper.TryGetGUID(text, out uint guid))
         {
             RawText = string.Empty;
             ID = guid;

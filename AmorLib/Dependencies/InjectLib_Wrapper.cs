@@ -13,15 +13,16 @@ public class InjectLib_Wrapper
     static InjectLib_Wrapper()
     {
         if (IL2CPPChainloader.Instance.Plugins.ContainsKey(PLUGIN_GUID))
-        {
-            IsLoaded = true;
+        {            
             try
             {
+                IsLoaded = true;
                 InjectLibConverter = (JsonConverter)Activator.CreateInstance(typeof(InjectLib.JsonNETInjection.Supports.InjectLibConnector))!;
             }
             catch (Exception ex)
             {
-                Logger.Error($"Exception thrown while reading data from PartialData:\n{ex}");
+                IsLoaded = false;
+                Logger.Error($"Exception thrown while reading data from InjectLib:\n{ex}");
             }
         }
 

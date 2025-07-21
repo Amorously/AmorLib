@@ -14,11 +14,11 @@ public static class JsonSerializerUtil
     {
         var setting = useLocalizedText ? JsonSerializer.DefaultSerializerSettingsWithLocalizedText : JsonSerializer.DefaultSerializerSettings;
 
-        if (usePartialData && PData_Wrapper.IsLoaded && PData_Wrapper.PersistentIDConverter != null)
-            setting.Converters.Add(PData_Wrapper.PersistentIDConverter);
+        if (usePartialData && PData_Wrapper.IsLoaded)
+            setting.Converters.Add(PData_Wrapper.PersistentIDConverter!);
 
-        if (useInjectLib && InjectLib_Wrapper.IsLoaded && InjectLib_Wrapper.InjectLibConverter != null)
-            setting.Converters.Add(InjectLib_Wrapper.InjectLibConverter);
+        if (useInjectLib && InjectLib_Wrapper.IsLoaded)
+            setting.Converters.Add(InjectLib_Wrapper.InjectLibConverter!);
 
         return setting;
     }

@@ -18,36 +18,47 @@ public static class PData_Wrapper
     {
         if (IL2CPPChainloader.Instance.Plugins.TryGetValue(PLUGIN_GUID, out var info))
         {
-            IsLoaded = true;
-            IsInitialized = MTFO.Ext.PartialData.PartialDataManager.Initialized;
-            IsMainBranch = info.VersionAtLeast("1.5.2");
             try
             {
+                IsLoaded = true;
+                IsInitialized = MTFO.Ext.PartialData.PartialDataManager.Initialized;
+                IsMainBranch = info.VersionAtLeast("1.5.2");
                 PersistentIDConverter = (JsonConverter)Activator.CreateInstance(typeof(MTFO.Ext.PartialData.JsonConverters.PersistentIDConverter))!;
-            } 
+            }
             catch (Exception ex)
             {
+                IsLoaded = false;
+                IsInitialized = false;
+                IsMainBranch = false;
                 Logger.Error($"Exception thrown while reading data from PartialData:\n{ex}");
-            }
+            }            
         }
 
         Logger.Debug($"PartialData is loaded and initialized: {IsLoaded && IsInitialized}, Version at least \"1.5.2\" (main branch): {IsMainBranch}");
         if (IsLoaded && !IsMainBranch)
         {
-            Logger.Warn("AWOPartialDataFixer (PartialDataModCompatible) is deprecated! It will still work, but it's recommended to switch to the main branch of PartialData");
+            Logger.Warn("AWOPartialDataFixer (PartialDataModCompatible) is deprecated, or older version! It will still work but it's recommended to switch to the main branch of PartialData");
         }
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
     public static bool TryGetGUID(string text, out uint guid)
+    {
+        if (IsLoaded && IsInitialized && IsMainBranch)
+        {
+            guid = GetGUID(text);
+            return guid != 0u; 
+        }
+        guid = 0u;
+        return false;
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static uint GetGUID(string text)
     {
         if (MTFO.Ext.PartialData.PersistentIDManager.TryGetId(text, out uint id))
         {
-            guid = id;
-            return true;
+            return id;
         }
-
-        guid = 0u;
-        return false;
+        return 0u;
     }
 }
