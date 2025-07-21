@@ -1,4 +1,5 @@
 ﻿using AIGraph;
+using AmorLib.Utils.Extensions;
 using LevelGeneration;
 using UnityEngine;
 
@@ -58,7 +59,7 @@ public class LightWorker
     /// <summary>
     /// Toggles the vanilla light flicker animation.
     /// </summary>
-    /// <returns><see langword="true"/> if the light had a light animation active.</returns>
+    /// <returns><see langword="True"/> if the light had a <see cref="LG_LightAnimator"/> component.</returns>
     public bool ToggleLightFlicker(bool enabled)
     {
         if (Animator == null) return false;
@@ -91,9 +92,7 @@ public class LightWorker
 
     private void AddModifier(LightModifier modifier)
     {
-        if (!_priorityDict.TryGetValue(modifier.Priority, out var stack))
-            _priorityDict.Add(modifier.Priority, stack = new());
-
+        var stack = _priorityDict.GetOrAddNew(modifier.Priority);
         modifier.Node = stack.AddLast(modifier);
         if (_currentNode == null || _currentNode.Value.Priority <= modifier.Priority)
         {
@@ -113,9 +112,13 @@ public class LightWorker
         }
 
         if (modifier.Node!.Previous != null)
+        {
             _currentNode = modifier.Node.Previous;
+        }
         else
+        {
             _currentNode = _priorityDict.Values.Last(list => list.Count > 0).Last;
+        }
 
         stack.Remove(modifier.Node);
         modifier.Node = null;
@@ -148,7 +151,7 @@ public class LightWorker
                 if (value == _color) return;
 
                 _color = value;
-                if (InUse)
+                if (InUse) 
                     _worker.ChangeLightColor(_color);
             }
         }
@@ -162,7 +165,7 @@ public class LightWorker
                 if (value == _intensity) return;
 
                 _intensity = value;
-                if (InUse)
+                if (InUse) 
                     _worker.ChangeLightIntensity(_intensity);
             }
         }
@@ -176,14 +179,14 @@ public class LightWorker
                 if (value == _enabled) return;
 
                 _enabled = value;
-                if (InUse)
+                if (InUse) 
                     _worker.SetLightEnabled(_enabled);
             }
         }
 
-        public int Priority { get; }
+        public int Priority { get; }       
+        public LinkedListNode<LightModifier>? Node { get; set; } 
         public bool Active => Node != null && _worker != null;
-        public LinkedListNode<LightModifier>? Node { get; set; }
         private bool InUse => Active && _worker._currentNode == Node;
         private readonly LightWorker _worker;
 
@@ -199,9 +202,8 @@ public class LightWorker
         public bool Register()
         {
             if (_worker == null) return false;
+            else if (Active) _worker._priorityDict[Priority].Remove(Node!);
 
-            if (Active)
-                _worker._priorityDict[Priority].Remove(Node!);
             _worker.AddModifier(this);
             return true;
         }
@@ -221,4 +223,3 @@ public class LightWorker
         }
     }
 }
-

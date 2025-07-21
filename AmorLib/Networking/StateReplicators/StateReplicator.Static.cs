@@ -32,9 +32,9 @@ public sealed partial class StateReplicator<S> where S : struct
         HostSetRecallStateEventName = $"SRre-{Name}-{HashName}";
         HandshakeEventName = $"RH-{Name}-{HashName}";
 
-        _clientRequestEvent = CreatePayloadEvent(StateSizeType, ClientRequestEventName, ClientRequestEventCallback);
-        _hostSetStateEvent = CreatePayloadEvent(StateSizeType, HostSetStateEventName, HostSetStateEventCallback);
-        _hostSetRecallStateEvent = CreatePayloadEvent(StateSizeType, HostSetRecallStateEventName, HostSetRecallStateEventCallback);
+        _clientRequestEvent = CreatePayloadEvent(ClientRequestEventName, ClientRequestEventCallback);
+        _hostSetStateEvent = CreatePayloadEvent(HostSetStateEventName, HostSetStateEventCallback);
+        _hostSetRecallStateEvent = CreatePayloadEvent(HostSetRecallStateEventName, HostSetRecallStateEventCallback);
         _handshake = CreateHandshakeEvent(HandshakeEventName);
 
         SNetEvents.OnBufferCapture += BufferStored;
@@ -104,7 +104,7 @@ public sealed partial class StateReplicator<S> where S : struct
         return highestSizeCap;
     }
 
-    private static IReplicatorEvent<S>? CreatePayloadEvent(Size size, string name, OnReceiveDel<S> callback)
+    private static IReplicatorEvent<S>? CreatePayloadEvent(string name, OnReceiveDel<S> callback)
     {
         if (NetworkAPI.IsEventRegistered(name))
         {
@@ -112,7 +112,7 @@ public sealed partial class StateReplicator<S> where S : struct
             return null;
         }
 
-        return new ReplicatorPayload<S, StatePayloadBytes>(size, name, callback);
+        return new ReplicatorPayload<S, StatePayloadBytes>(StateSizeType, name, callback);
     }
 
     private static ReplicatorHandshake? CreateHandshakeEvent(string name)

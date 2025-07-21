@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using AmorLib.Events;
+using HarmonyLib;
 using SNetwork;
 
 namespace AmorLib.Patches.SNet;
@@ -10,6 +11,6 @@ internal static class Patch_OnRecallDone
     [HarmonyWrapSafe]
     private static void Post_RecallDone()
     {
-        Events.SNetEvents.RecallDone();
+        SNetEvents.RecallDone();
     }
 }

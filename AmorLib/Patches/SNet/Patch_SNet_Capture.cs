@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using AmorLib.Events;
+using HarmonyLib;
 using SNetwork;
 
 namespace AmorLib.Patches.SNet;
@@ -11,7 +12,7 @@ internal static class Patch_SNet_Capture
     [HarmonyWrapSafe]
     private static void Pre_TriggerCapture(SNet_Capture __instance)
     {
-        Events.SNetEvents.BufferCaptured(__instance.PrimedBufferType);
+        SNetEvents.BufferCaptured(__instance.PrimedBufferType);
     }
 
     [HarmonyPatch(nameof(SNet_Capture.RecallBuffer))]
@@ -21,6 +22,6 @@ internal static class Patch_SNet_Capture
     {
         if (__instance.IsRecalling) return; 
 
-        Events.SNetEvents.BufferRecalled(bufferType);
+        SNetEvents.BufferRecalled(bufferType);
     }
 }

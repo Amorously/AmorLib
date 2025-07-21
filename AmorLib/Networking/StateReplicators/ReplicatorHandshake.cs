@@ -31,7 +31,7 @@ internal sealed class ReplicatorHandshake
     {
         EventName = eventName;
         NetworkAPI.RegisterEvent<Packet>(EventName, OnSyncAction);
-        SNetEvents.OnCheckpointReload += OnRecallDone;
+        SNetEvents.OnRecallDone += OnRecallDone;
     }
 
     private void OnRecallDone()
@@ -69,7 +69,7 @@ internal sealed class ReplicatorHandshake
             }
             else
             {
-                Logger.Warn("Handshake :: OnSyncAction host sync request?");
+                Logger.Warn("Handshake :: OnSyncAction host sync request has no implementation");
             }
         }
         else if (SNet.IsMaster)

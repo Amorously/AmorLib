@@ -10,19 +10,19 @@ public interface ILightModifier
     /// <summary>
     /// The color of this modifier.
     /// </summary>
-    /// <value>Updates light color when modified if active.</value>
+    /// <value>Updates light color when modified, if <see cref="Active"/> is <see langword="true"/>.</value>
     public Color Color { get; set; }
 
     /// <summary>
     /// The intensity of this modifier.
     /// </summary>
-    /// <value>Updates light intensity when modified if active.</value>
+    /// <value>Updates light intensity when modified, if <see cref="Active"/> is <see langword="true"/>.</value>
     public float Intensity { get; set; }
 
     /// <summary>
     /// The (light) enabled state of this modifer.
     /// </summary>
-    /// <value>Updates light enabled state when modified if active.</value>
+    /// <value>Updates enabled state when modified, if <see cref="Active"/> is <see langword="true"/>..</value>
     public bool Enabled { get; set; }
 
     /// <summary>
@@ -36,7 +36,7 @@ public interface ILightModifier
     public bool Active { get; }
 
     /// <summary>
-    /// Sets a new color, intensity, and enabled state for the modifier if active.
+    /// Sets a new light color, intensity, and enabled state for the modifier, if <see cref="Active"/> is <see langword="true"/>.
     /// </summary>
     public void Set(Color color, float intensity, bool enabled)
     {
@@ -48,7 +48,7 @@ public interface ILightModifier
     /// <summary>
     /// Adds the modifier back to the top of the stack.
     /// </summary>
-    /// <returns>False if the light no longer exists.</returns>
+    /// <returns>False if the light does not exist.</returns>
     public bool Register(); 
 
     /// <summary>

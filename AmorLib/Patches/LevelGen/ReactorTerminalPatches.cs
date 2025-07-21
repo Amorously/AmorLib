@@ -17,7 +17,7 @@ internal static class ReactorTerminalPatches
     static ReactorTerminalPatches()
     {
         LevelAPI.OnLevelCleanup += OnLevelCleanup;
-        LevelEvents.OnBuildDoneEarly += OnBuildDoneEarly;
+        LevelEvents.OnAfterBuildBatch += OnAfterBatchBuild;
     }
 
     private static void OnLevelCleanup()
@@ -25,15 +25,18 @@ internal static class ReactorTerminalPatches
         ReactorTerminals.Clear();
     }
     
-    private static void OnBuildDoneEarly()
+    private static void OnAfterBatchBuild(LG_Factory.BatchName batch)
     {
+        if (batch != LG_Factory.BatchName.SpecificSpawning) return;
+
         foreach (var kvp in ReactorTerminals)
         {
             if (kvp.Key.TryGetZone(out var zone))
-            {
+            {                
                 zone.TerminalsSpawnedInZone.Add(kvp.Value);
+                Logger.Debug("Apended reactor terminal to its TerminalsSpawnedInZone");
             }
-        }
+        }        
     }    
 
     [HarmonyPatch(typeof(LG_WardenObjective_Reactor), nameof(LG_WardenObjective_Reactor.Start))]
@@ -69,7 +72,7 @@ internal static class ReactorTerminalPatches
     [HarmonyPatch(typeof(LG_WardenObjective_Reactor), nameof(LG_WardenObjective_Reactor.GenericObjectiveSetup))]
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    private static void Post_ReactorTerminalSetup(LG_WardenObjective_Reactor __instance) // ripped from AWO
+    private static void ReactorTerminalInZoneFix(LG_WardenObjective_Reactor __instance) // ripped from AWO
     {
         if (__instance.SpawnNode.m_zone.TerminalsSpawnedInZone != null && __instance.m_terminal != null)
         {

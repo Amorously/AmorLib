@@ -57,7 +57,7 @@ public static class LightAPI
         }
     }
 
-    public static IEnumerable<ILightModifier> AddLightModifiers(this IEnumerable<LightWorker> lightWorkers, Color color, float intensity, bool enabled, int priority = 1000)
+    public static IEnumerable<ILightModifier> AddLightModifiers(this IEnumerable<LightWorker> lightWorkers, Color color, float intensity, bool enabled, int priority = LightPriority.Normal)
     {
         return lightWorkers.Select(worker => worker.AddModifier(color, intensity, enabled, priority));
     }
