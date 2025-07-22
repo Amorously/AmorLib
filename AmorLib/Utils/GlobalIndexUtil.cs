@@ -21,6 +21,11 @@ public static class GlobalIndexUtil
         return ((int)dimension, (int)layer, (int)zone);
     }
 
+    public static GlobalZoneIndex ToStruct(eDimensionIndex dimension, LG_LayerType layer, eLocalZoneIndex zone)
+    {
+        return new(dimension, layer, zone);
+    }
+
     public static bool TryGetZone(this (int, int, int) index, [NotNullWhen(true)] out LG_Zone? zone)
     {
         if (!Builder.CurrentFloor.TryGetZoneByLocalIndex((eDimensionIndex)index.Item1, (LG_LayerType)index.Item2, (eLocalZoneIndex)index.Item3, out zone))
@@ -36,3 +41,4 @@ public static class GlobalIndexUtil
         return TryGetZone(index.ToIntTuple(), out zone);
     }
 }
+
