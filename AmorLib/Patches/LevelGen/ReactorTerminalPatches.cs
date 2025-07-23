@@ -34,7 +34,7 @@ internal static class ReactorTerminalPatches
             if (kvp.Key.TryGetZone(out var zone))
             {                
                 zone.TerminalsSpawnedInZone.Add(kvp.Value);
-                Logger.Debug("Apended reactor terminal to its TerminalsSpawnedInZone");
+                Logger.Debug("Appended reactor terminal to its TerminalsSpawnedInZone");
             }
         }        
     }    

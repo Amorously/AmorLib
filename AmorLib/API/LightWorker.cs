@@ -141,8 +141,7 @@ public class LightWorker
     }
 
     class LightModifier : ILightModifier
-    {
-        private Color _color;
+    {        
         public Color Color
         {
             get => _color;
@@ -155,8 +154,9 @@ public class LightWorker
                     _worker.ChangeLightColor(_color);
             }
         }
+        private Color _color;
 
-        private float _intensity;
+        
         public float Intensity
         {
             get => _intensity;
@@ -169,8 +169,9 @@ public class LightWorker
                     _worker.ChangeLightIntensity(_intensity);
             }
         }
+        private float _intensity;
 
-        private bool _enabled;
+        
         public bool Enabled
         {
             get => _enabled;
@@ -183,6 +184,7 @@ public class LightWorker
                     _worker.SetLightEnabled(_enabled);
             }
         }
+        private bool _enabled;
 
         public int Priority { get; }       
         public LinkedListNode<LightModifier>? Node { get; set; } 
