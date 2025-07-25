@@ -1,4 +1,6 @@
-﻿using GameData;
+﻿using AmorLib.Events;
+using GameData;
+using GTFO.API;
 using LevelGeneration;
 using System.Text.Json.Serialization;
 
@@ -10,12 +12,7 @@ public abstract class GlobalBase
     public eDimensionIndex DimensionIndex
     {
         get => _dimIndex;
-        set 
-        { 
-            _dimIndex = value; 
-            Dimension = Dimension.GetDimension(_dimIndex, out var d) ? d : null;
-            RaiseFlag();
-        }
+        set { _dimIndex = value; RaiseFlag(); }
     }
     private eDimensionIndex _dimIndex = eDimensionIndex.Reality;
 
@@ -49,15 +46,30 @@ public abstract class GlobalBase
     }
     private (int dim, int layer, int zone) _tuple;
 
-    [JsonIgnore]
-    public Dimension? Dimension { get; private set; }
-    [JsonIgnore]
-    public LG_Zone? Zone { get; private set; }    
+    public Dimension? Dimension;
+    public LG_Zone? Zone;
     private bool _updateFlag = true;
 
     protected GlobalBase()
     {
         Refresh();
+        LevelEvents.OnAfterBuildBatch += OnAfterBuildBatch;
+        LevelAPI.OnLevelCleanup += OnLevelCleanup;
+    }    
+
+    private void OnAfterBuildBatch(LG_Factory.BatchName batch)
+    {
+        if (batch == LG_Factory.BatchName.Geomorphs)
+        {
+            Dimension = Dimension.GetDimension(_dimIndex, out var d) ? d : null;
+            Zone = _tuple.TryGetZone(out var z) ? z : null;
+        }
+    }
+    
+    private void OnLevelCleanup()
+    {
+        Dimension = null;
+        Zone = null;
     }
 
     private void RaiseFlag() => _updateFlag = true;
@@ -67,7 +79,6 @@ public abstract class GlobalBase
         if (!_updateFlag) return;
         _struct = GlobalIndexUtil.ToStruct(DimensionIndex, Layer, LocalIndex);
         _tuple = GlobalIndexUtil.ToIntTuple(DimensionIndex, Layer, LocalIndex);
-        Zone = _tuple.TryGetZone(out var z) ? z : null;
         _updateFlag = false;
     }
 
