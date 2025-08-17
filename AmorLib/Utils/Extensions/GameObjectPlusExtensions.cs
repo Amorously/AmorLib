@@ -69,6 +69,6 @@ public static class GameObjectPlusExtensions
     public static bool IsWithinSqrDistance(this Vector3 a, Vector3 b, float threshold, out float sqrDistance)
     {
         sqrDistance = (a - b).sqrMagnitude;
-        return sqrDistance <= threshold * threshold;
+        return sqrDistance <= threshold;
     }
 }

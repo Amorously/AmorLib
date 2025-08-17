@@ -1,5 +1,4 @@
 ﻿using AIGraph;
-using AmorLib.Events;
 using AmorLib.Utils;
 using BepInEx.Unity.IL2CPP;
 using GTFO.API;
@@ -16,7 +15,7 @@ internal static class TerminalPatches
 
     static TerminalPatches()
     {
-        LevelEvents.OnAfterBuildBatch += OnAfterBatchBuild;
+        LevelAPI.OnAfterBuildBatch += OnAfterBatchBuild;
         LevelAPI.OnLevelCleanup += OnLevelCleanup;
     }
 

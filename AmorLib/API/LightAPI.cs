@@ -1,5 +1,4 @@
 ﻿using AIGraph;
-using AmorLib.Events;
 using AmorLib.Utils;
 using AmorLib.Utils.Extensions;
 using GTFO.API;
@@ -16,9 +15,9 @@ public static class LightAPI
     internal static readonly ConcurrentDictionary<int, LightWorker> AllLightsMap = new();
 
     static LightAPI()
-    {
+    {        
+        LevelAPI.OnAfterBuildBatch += OnAfterZoneLightsBatch;
         LevelAPI.OnLevelCleanup += OnLevelCleanup;
-        LevelEvents.OnAfterBuildBatch += OnAfterZoneLightsBatch;
     }
 
     private static void OnLevelCleanup()

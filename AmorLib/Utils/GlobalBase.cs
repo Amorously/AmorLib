@@ -1,5 +1,4 @@
-﻿using AmorLib.Events;
-using GameData;
+﻿using GameData;
 using GTFO.API;
 using LevelGeneration;
 using System.Text.Json.Serialization;
@@ -12,7 +11,7 @@ public abstract class GlobalBase
     public eDimensionIndex DimensionIndex
     {
         get => _dimIndex;
-        set { _dimIndex = value; RaiseFlag(); }
+        set { _dimIndex = value; MarkDirty(); }
     }
     private eDimensionIndex _dimIndex = eDimensionIndex.Reality;
 
@@ -20,7 +19,7 @@ public abstract class GlobalBase
     public LG_LayerType Layer
     {
         get => _layerType;
-        set { _layerType = value; RaiseFlag(); }
+        set { _layerType = value; MarkDirty(); }
     }
     private LG_LayerType _layerType = LG_LayerType.MainLayer;
 
@@ -28,32 +27,26 @@ public abstract class GlobalBase
     public eLocalZoneIndex LocalIndex
     {
         get => _localIndex;
-        set { _localIndex = value; RaiseFlag(); }
+        set { _localIndex = value; MarkDirty(); }
     }
     private eLocalZoneIndex _localIndex = eLocalZoneIndex.Zone_0;
 
     [JsonIgnore]
-    public GlobalZoneIndex GlobalZoneIndex
-    {
-        get { Refresh(); return _struct; }
-    }
+    public GlobalZoneIndex GlobalZoneIndex { get { Refresh(); return _struct; } }
     private GlobalZoneIndex _struct;
 
     [JsonIgnore]
-    public (int dimension, int layer, int zone) IntTuple
-    {
-        get { Refresh(); return _tuple; }
-    }
+    public (int dimension, int layer, int zone) IntTuple { get { Refresh(); return _tuple; } }
     private (int dim, int layer, int zone) _tuple;
 
     public Dimension? Dimension;
     public LG_Zone? Zone;
-    private bool _updateFlag = true;
+    private bool _isDirty = true;
 
     protected GlobalBase()
     {
         Refresh();
-        LevelEvents.OnAfterBuildBatch += OnAfterBuildBatch;
+        LevelAPI.OnAfterBuildBatch += OnAfterBuildBatch;
         LevelAPI.OnLevelCleanup += OnLevelCleanup;
     }    
 
@@ -72,14 +65,14 @@ public abstract class GlobalBase
         Zone = null;
     }
 
-    private void RaiseFlag() => _updateFlag = true;
+    private void MarkDirty() => _isDirty = true;
 
     private void Refresh()
     {
-        if (!_updateFlag) return;
+        if (!_isDirty) return;
         _struct = GlobalIndexUtil.ToStruct(DimensionIndex, Layer, LocalIndex);
         _tuple = GlobalIndexUtil.ToIntTuple(DimensionIndex, Layer, LocalIndex);
-        _updateFlag = false;
+        _isDirty = false;
     }
 
     public override string ToString() => $"({DimensionIndex}, {Layer}, {LocalIndex})";

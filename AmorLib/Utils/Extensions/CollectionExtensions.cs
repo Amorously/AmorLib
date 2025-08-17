@@ -3,21 +3,6 @@
 public static class CollectionExtensions
 {
     /// <summary>
-    /// Converts a <see cref="Il2CppSystem.Collections.Generic.List{T}"/> to <see cref="List{T}"/>.
-    /// </summary>
-    /// <remarks>(Borrowed from GTFO-API until it is updated.)</remarks>
-    /// <returns>A copy of the list as <see cref="List{T}"/>.</returns>
-    public static List<T> ToManaged<T>(this Il2CppSystem.Collections.Generic.List<T> list)
-    {
-        List<T> managedList = new(list.Count);
-        for (int i = 0; i < list.Count; i++)
-        {
-            managedList.Add(list[i]);
-        }
-        return managedList;
-    }
-
-    /// <summary>
     /// Creates a new default <typeparamref name="TValue"/> if the key doesn't exist and returns the value.
     /// </summary>
     /// <remarks>
