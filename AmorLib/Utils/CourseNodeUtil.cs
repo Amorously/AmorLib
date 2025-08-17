@@ -9,13 +9,13 @@ namespace AmorLib.Utils;
 
 [CallConstructorOnLoad]
 public static class CourseNodeUtil // credits: Dinorush
-{
+{    
+    private readonly static Dictionary<eDimensionIndex, DimensionMap> _maps = new();
+
     static CourseNodeUtil()
     {
         LevelAPI.OnAfterBuildBatch += OnAfterBuildBatch;
-    }
-
-    private readonly static Dictionary<eDimensionIndex, DimensionMap> _maps = new();
+    }   
 
     private static void OnAfterBuildBatch(LG_Factory.BatchName batch)
     {

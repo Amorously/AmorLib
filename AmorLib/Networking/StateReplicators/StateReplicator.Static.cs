@@ -35,7 +35,7 @@ public sealed partial class StateReplicator<S> where S : struct
         _clientRequestEvent = CreatePayloadEvent(ClientRequestEventName, ClientRequestEventCallback);
         _hostSetStateEvent = CreatePayloadEvent(HostSetStateEventName, HostSetStateEventCallback);
         _hostSetRecallStateEvent = CreatePayloadEvent(HostSetRecallStateEventName, HostSetRecallStateEventCallback);
-        _handshake = CreateHandshakeEvent(HandshakeEventName);
+        _handshake = CreateHandshakeEvent();
 
         SNetEvents.OnBufferCapture += BufferStored;
         SNetEvents.OnBufferRecall += BufferRecalled;
@@ -115,15 +115,15 @@ public sealed partial class StateReplicator<S> where S : struct
         return new ReplicatorPayload<S, StatePayloadBytes>(StateSizeType, name, callback);
     }
 
-    private static ReplicatorHandshake? CreateHandshakeEvent(string name)
+    private static ReplicatorHandshake? CreateHandshakeEvent()
     {
-        if (NetworkAPI.IsEventRegistered(name))
+        if (NetworkAPI.IsEventRegistered(HandshakeEventName))
         {
-            Logger.Error($"ReplicatorHandshake<{Name}> failed to initialize: Event name {name} is already registered!");
+            Logger.Error($"ReplicatorHandshake<{Name}> failed to initialize: Event name {HandshakeEventName} is already registered!");
             return null;
         }
 
-        var handshake = new ReplicatorHandshake(name);
+        var handshake = new ReplicatorHandshake(HandshakeEventName);
         handshake.OnClientSyncRequested += ClientSyncRequested;
         return handshake;
     }
