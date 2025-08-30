@@ -9,13 +9,13 @@ namespace AmorLib.Utils;
 
 [CallConstructorOnLoad]
 public static class CourseNodeUtil // credits: Dinorush
-{    
+{
     private readonly static Dictionary<eDimensionIndex, DimensionMap> _maps = new();
 
     static CourseNodeUtil()
     {
         LevelAPI.OnAfterBuildBatch += OnAfterBuildBatch;
-    }   
+    }
 
     private static void OnAfterBuildBatch(LG_Factory.BatchName batch)
     {
@@ -51,6 +51,94 @@ public static class CourseNodeUtil // credits: Dinorush
         Logger.Warn("Built DimensionMaps");
     }
 
+    // AIG_NodeCluster.TryGetClosestNodeInCluster pasted but inner loop changed to clamp position
+    private static bool TryGetClosestNodeInCluster(AIG_NodeCluster cluster, Vector3 position, out AIG_INode node)
+    {
+        var voxelVolume = cluster.m_nodeVolume.m_voxelNodeVolume;
+        if (voxelVolume.TryGetCloseVoxelNode_Safe(position, position.y - 0.5f, position.y + 0.5f, out node))
+            return true;
+
+        voxelVolume.GetGridPosition(position, out var x, out var z);
+        x = Mathf.Clamp(x, 0, voxelVolume.m_countX - 1);
+        z = Mathf.Clamp(z, 0, voxelVolume.m_countZ - 1);
+
+        float bestDist = float.PositiveInfinity;
+        AIG_VoxelNode? bestNode = null;
+        for (int i = -1; i < 2; i++)
+        {
+            for (int j = -1; j < 2; j++)
+            {
+                if (voxelVolume.TryGetPillar(x + i, z + j, out var pillar))
+                {
+                    foreach (var pillarNode in pillar.m_nodes)
+                    {
+                        if (pillarNode.ClusterID != cluster.ID)
+                            continue;
+
+                        float sqrMagnitude = (pillarNode.Position - position).sqrMagnitude;
+                        if (sqrMagnitude < bestDist)
+                        {
+                            bestNode = pillarNode;
+                            bestDist = sqrMagnitude;
+                            if (bestDist < 0.55f)
+                            {
+                                node = bestNode.Cast<AIG_INode>();
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (bestNode != null)
+        {
+            node = bestNode.Cast<AIG_INode>();
+            return true;
+        }
+        return false;
+    }
+
+    public static AIG_CourseNode ResolveCourseNode(AIG_CourseNode[] list, Vector3 position)
+    {
+        if (list == null)
+            return null!;
+
+        if (list.Length == 1)
+            return list[0];
+
+        // Retrieve the closest nodes in each course node
+        (AIG_CourseNode, AIG_INode)[] bestNodes = new (AIG_CourseNode, AIG_INode)[list.Length];
+        int index = 0;
+        foreach (var courseNode in list)
+        {
+            if (!TryGetClosestNodeInCluster(courseNode.m_nodeCluster, position, out var node))
+                node = courseNode.m_nodeCluster.m_nodes[0]; // Position probably isn't near the map, just get something
+            bestNodes[index++] = (courseNode, node);
+        }
+
+        // Determine the closest of the closest nodes
+        // Prioritize below the position so hitting a roof uses the node with the roof
+        bool bestIsValidHeight = false;
+        float bestDist = float.PositiveInfinity;
+        AIG_CourseNode bestNode = null!;
+        foreach ((var courseNode, var node) in bestNodes)
+        {
+            if (node == null) continue;
+
+            bool validHeight = node.Position.y - 0.25f <= position.y;
+            float sqrDist = (position - node.Position).sqrMagnitude;
+            if ((!bestIsValidHeight && validHeight) || (bestIsValidHeight == validHeight && sqrDist < bestDist))
+            {
+                bestIsValidHeight = validHeight;
+                bestDist = sqrDist;
+                bestNode = courseNode;
+            }
+        }
+
+        return bestNode;
+    }
+
     public static AIG_CourseNode GetCourseNode(Vector3 position, eDimensionIndex dimensionIndex)
     {
         if (!_maps.TryGetValue(dimensionIndex, out var map))
@@ -59,7 +147,18 @@ public static class CourseNodeUtil // credits: Dinorush
             return null!;
         }
 
-        return map.GetNode(position);
+        return ResolveCourseNode(map.GetNodes(position), position);
+    }
+
+    public static AIG_CourseNode[] GetCourseNodes(Vector3 position, eDimensionIndex dimensionIndex)
+    {
+        if (!_maps.TryGetValue(dimensionIndex, out var map))
+        {
+            Logger.Error($"No Position-To-Node map for dimension {dimensionIndex}!");
+            return null!;
+        }
+
+        return map.GetNodes(position);
     }
 
     class DimensionMap
@@ -101,7 +200,7 @@ public static class CourseNodeUtil // credits: Dinorush
         {
             return 
                 (
-                  Math.Clamp((int)(position.x / IndexSize) - MinCellBound.x, 0, MapSize.x - 1), 
+                  Math.Clamp((int)(position.x / IndexSize) - MinCellBound.x, 0, MapSize.x - 1),
                   Math.Clamp((int)(position.z / IndexSize) - MinCellBound.z, 0, MapSize.z - 1)
                 );
         }
@@ -129,7 +228,8 @@ public static class CourseNodeUtil // credits: Dinorush
         public AIG_CourseNode[] GetNodes(Vector3 position)
         {
             var (x, z) = GetMapPos(position);
-            if (NodeMap[x, z] != null) return NodeMap[x, z];
+            if (NodeMap[x, z] != null)
+                return NodeMap[x, z];
 
             float maxRadius = Math.Max(MapSize.x, MapSize.z);
             // Check increasing rings to find a nearby node
@@ -159,50 +259,6 @@ public static class CourseNodeUtil // credits: Dinorush
 
             Logger.Error($"Unable to get any node for ({position})! How are you even playing the game?!");
             return null!;
-        }
-
-        public AIG_CourseNode GetNode(Vector3 position)
-        {
-            var list = GetNodes(position);
-            if (list == null) return null!;
-            else if (list.Length == 1) return list[0];
-
-            // Retrieve the closest nodes in each course node
-            (AIG_CourseNode, AIG_INode)[] bestNodes = new (AIG_CourseNode, AIG_INode)[list.Length];
-            int index = 0;
-            foreach (var courseNode in list)
-            {
-                float bestDistInNode = float.PositiveInfinity;
-                AIG_INode bestNodeInNode = null!;
-                foreach (var node in courseNode.m_nodeCluster.m_nodes)
-                {
-                    if (position.IsWithinSqrDistance(node.Position, bestDistInNode, out float sqrDist))
-                    {
-                        bestDistInNode = sqrDist;
-                        bestNodeInNode = node;
-                    }
-                }
-                bestNodes[index++] = (courseNode, bestNodeInNode);
-            }
-
-            // Determine the closest of the closest nodes
-            // Prioritize below the position so hitting a roof uses the node with the roof
-            bool bestIsValidHeight = false;
-            float bestDist = float.PositiveInfinity;
-            AIG_CourseNode bestNode = null!;
-            foreach ((var courseNode, var node) in bestNodes)
-            {
-                bool validHeight = node.Position.y - 0.25f <= position.y;
-                bool isWithinDist = position.IsWithinSqrDistance(node.Position, bestDist, out float sqrDist);
-                if (!bestIsValidHeight && validHeight || bestIsValidHeight == validHeight && isWithinDist)
-                {
-                    bestIsValidHeight = validHeight;
-                    bestDist = sqrDist;
-                    bestNode = courseNode;
-                }
-            }
-
-            return bestNode;
         }
     }
 }
