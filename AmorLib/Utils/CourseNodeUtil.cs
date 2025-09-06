@@ -1,5 +1,4 @@
 ﻿using AIGraph;
-using AmorLib.Utils.Extensions;
 using GTFO.API;
 using GTFO.API.Extensions;
 using LevelGeneration;
@@ -19,36 +18,34 @@ public static class CourseNodeUtil // credits: Dinorush
 
     private static void OnAfterBuildBatch(LG_Factory.BatchName batch)
     {
-        if (batch != LG_Factory.BatchName.AIGraph_AirGraph_PostProcess) return;
         _maps.Clear();
 
-        var clustersByDim = AIG_NodeCluster.AllNodeClusters.ToManaged().GroupBy(c => c.m_courseNode.m_dimension.DimensionIndex);
-        foreach (var group in clustersByDim)
+        foreach (var cluster in AIG_NodeCluster.AllNodeClusters)
         {
-            var dim = group.Key;
-            var map = _maps.GetOrAddNew(dim);
+            if (!_maps.TryGetValue(cluster.m_courseNode.m_dimension.DimensionIndex, out var map))
+                _maps.Add(cluster.m_courseNode.m_dimension.DimensionIndex, map = new());
 
-            foreach (var cluster in group)
-                foreach (var node in cluster.m_nodes)
-                    map.UpdateBounds(node.Position);
+            foreach (var node in cluster.m_nodes)
+                map.UpdateBounds(node.Position);
+        }
 
+        foreach (var map in _maps.Values)
             map.CreateNodeMap();
 
-            foreach (var cluster in group)
+        foreach (var cluster in AIG_NodeCluster.AllNodeClusters)
+        {
+            var map = _maps[cluster.m_courseNode.m_dimension.DimensionIndex];
+            var id = cluster.CourseNode.NodeID;
+            foreach (var node in cluster.m_nodes)
             {
-                var courseNode = cluster.CourseNode;
-                var id = courseNode.NodeID;
-                foreach (var node in cluster.m_nodes)
-                {
-                    var list = map.GetBuildNodeList(node.Position);
-                    if (!list.Any(n => n.NodeID == id))
-                        list.Add(courseNode);
-                }
+                var list = map.GetBuildNodeList(node.Position);
+                if (!list.Any(node => id == node.NodeID))
+                    list.Add(cluster.CourseNode);
             }
-
-            map.FinishBuild();
         }
-        Logger.Warn("Built DimensionMaps");
+
+        foreach (var map in _maps.Values)
+            map.FinishBuild();
     }
 
     // AIG_NodeCluster.TryGetClosestNodeInCluster pasted but inner loop changed to clamp position
@@ -62,7 +59,7 @@ public static class CourseNodeUtil // credits: Dinorush
         x = Mathf.Clamp(x, 0, voxelVolume.m_countX - 1);
         z = Mathf.Clamp(z, 0, voxelVolume.m_countZ - 1);
 
-        float bestDist = float.PositiveInfinity;
+        float bestDist = float.MaxValue;
         AIG_VoxelNode? bestNode = null;
         for (int i = -1; i < 2; i++)
         {
@@ -120,7 +117,7 @@ public static class CourseNodeUtil // credits: Dinorush
         // Determine the closest of the closest nodes
         // Prioritize below the position so hitting a roof uses the node with the roof
         bool bestIsValidHeight = false;
-        float bestDist = float.PositiveInfinity;
+        float bestDist = float.MaxValue;
         AIG_CourseNode bestNode = null!;
         foreach ((var courseNode, var node) in bestNodes)
         {
@@ -171,7 +168,7 @@ public static class CourseNodeUtil // credits: Dinorush
         public (int x, int z) MaxCellBound;
         public (int x, int z) MapSize;
 
-        public DimensionMap()
+        internal DimensionMap()
         {
             BuildNodeMap = null!;
             NodeMap = null!;
@@ -198,10 +195,9 @@ public static class CourseNodeUtil // credits: Dinorush
 
         internal (int x, int z) GetMapPos(Vector3 position)
         {
-            return 
-                (
-                  Math.Clamp((int)(position.x / IndexSize) - MinCellBound.x, 0, MapSize.x - 1),
-                  Math.Clamp((int)(position.z / IndexSize) - MinCellBound.z, 0, MapSize.z - 1)
+            return (
+                Math.Clamp((int)(position.x / IndexSize) - MinCellBound.x, 0, MapSize.x - 1),
+                Math.Clamp((int)(position.z / IndexSize) - MinCellBound.z, 0, MapSize.z - 1)
                 );
         }
 
@@ -209,7 +205,8 @@ public static class CourseNodeUtil // credits: Dinorush
         {
             var (x, z) = GetMapPos(position);
             var list = BuildNodeMap[x, z];
-            list ??= BuildNodeMap[x, z] = new();
+            if (list == null)
+                list = BuildNodeMap[x, z] = new();
             return list;
         }
 
