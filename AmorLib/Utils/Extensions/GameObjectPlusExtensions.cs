@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using LevelGeneration;
+using System.Text;
 using UnityEngine;
 using AkEventCallback = AkCallbackManager.EventCallback;
 
@@ -50,6 +51,40 @@ public static class GameObjectPlusExtensions
     }
 
     /// <summary>
+    /// Creates a clone of a <see cref="GameObject"/> and instantiates any child <see cref="LG_PrefabSpawner"/>.
+    /// </summary>
+    public static GameObject ClonePrefabSpawners(this GameObject original, Vector3 position, Quaternion rotation, Transform parent)
+    {
+        var clone = UnityEngine.Object.Instantiate(original, position, rotation, parent);
+
+        foreach (var spawner in clone.GetComponentsInChildren<LG_PrefabSpawner>())
+        {
+            try
+            {
+                GameObject prefab = UnityEngine.Object.Instantiate(spawner.m_prefab, spawner.transform.position, spawner.transform.rotation, spawner.transform.parent);
+                if (spawner.m_disableCollision)
+                {
+                    foreach (Collider collider in prefab.GetComponentsInChildren<Collider>())
+                    {
+                        collider.enabled = false;
+                    }
+                }
+                if (spawner.m_applyScale)
+                {
+                    prefab.transform.localScale = spawner.transform.localScale;
+                }
+                prefab.transform.SetParent(spawner.transform);
+            }
+            catch
+            {
+                continue;
+            }
+        }
+
+        return clone;
+    }
+
+    /// <summary>
     /// Posts a sound event and registers a cleanup callback upon completion.
     /// </summary>
     public static uint PostWithCleanup(this CellSoundPlayer soundPlayer, uint eventID, Vector3 pos, uint in_uFlags = 1u)
@@ -64,11 +99,11 @@ public static class GameObjectPlusExtensions
     }
 
     /// <summary>
-    /// Compares the square magnitude of two <see cref="Vector3"/> values to the square of <paramref name="threshold"/>.
+    /// Compares the square magnitude of two <see cref="Vector3"/> values to the square of <paramref name="sqrThreshold"/>.
     /// </summary>
-    public static bool IsWithinSqrDistance(this Vector3 a, Vector3 b, float threshold, out float sqrDistance)
+    public static bool IsWithinSqrDistance(this Vector3 a, Vector3 b, float sqrThreshold, out float sqrDistance)
     {
         sqrDistance = (a - b).sqrMagnitude;
-        return sqrDistance <= threshold;
+        return sqrDistance <= sqrThreshold;
     }
 }
