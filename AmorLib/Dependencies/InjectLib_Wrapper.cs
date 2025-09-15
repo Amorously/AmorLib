@@ -1,4 +1,6 @@
 ﻿using BepInEx.Unity.IL2CPP;
+using HarmonyLib;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 namespace AmorLib.Dependencies;
@@ -12,20 +14,28 @@ public class InjectLib_Wrapper
 
     static InjectLib_Wrapper()
     {
-        if (IL2CPPChainloader.Instance.Plugins.ContainsKey(PLUGIN_GUID))
-        {            
-            try
+        Setup();
+        Logger.Debug($"InjectLib is loaded: {IsLoaded}");
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void Setup()
+    {
+        if (!IL2CPPChainloader.Instance.Plugins.ContainsKey(PLUGIN_GUID)) return;
+
+        try
+        {
+            var ilAsm = AccessTools.TypeByName("InjectLib.JsonNETInjection.Supports.InjectLibConnector");
+            if (ilAsm != null && typeof(JsonConverter).IsAssignableFrom(ilAsm))
             {
-                IsLoaded = true;
-                InjectLibConverter = (JsonConverter)Activator.CreateInstance(typeof(InjectLib.JsonNETInjection.Supports.InjectLibConnector))!;
-            }
-            catch (Exception ex)
-            {
-                IsLoaded = false;
-                Logger.Error($"Exception thrown while reading data from InjectLib:\n{ex}");
+                InjectLibConverter = (JsonConverter?)Activator.CreateInstance(ilAsm);
+                IsLoaded = InjectLibConverter != null;
             }
         }
-
-        Logger.Debug($"InjectLib is loaded: {IsLoaded}");
+        catch (Exception ex)
+        {
+            IsLoaded = false;
+            Logger.Error($"Exception thrown while reading data from InjectLib:\n{ex}");
+        }
     }
 }
