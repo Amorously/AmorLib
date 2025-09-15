@@ -1,6 +1,5 @@
 ﻿using AIGraph;
 using GTFO.API;
-using GTFO.API.Extensions;
 using LevelGeneration;
 using UnityEngine;
 
@@ -18,6 +17,8 @@ public static class CourseNodeUtil // credits: Dinorush
 
     private static void OnAfterBuildBatch(LG_Factory.BatchName batch)
     {
+        if (batch != LG_Factory.BatchName.AIGraph_AirGraph_PostProcess) return;
+
         _maps.Clear();
 
         foreach (var cluster in AIG_NodeCluster.AllNodeClusters)
