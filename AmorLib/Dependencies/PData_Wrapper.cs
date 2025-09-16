@@ -16,37 +16,32 @@ public static class PData_Wrapper
 
     static PData_Wrapper()
     {
-        Setup();
-        Logger.Debug($"PartialData is loaded: {IsLoaded}, Version at least \"1.5.2\" (main branch): {IsMainBranch}");
+        if (IL2CPPChainloader.Instance.Plugins.TryGetValue(PLUGIN_GUID, out var info))
+        {
+            try
+            {
+                IsMainBranch = info.VersionAtLeast("1.5.2");
+                var pdType = AccessTools.TypeByName("MTFO.Ext.PartialData.JsonConverters.PersistentIDConverter");
+                if (pdType != null && typeof(JsonConverter).IsAssignableFrom(pdType))
+                {
+                    PersistentIDConverter = (JsonConverter?)Activator.CreateInstance(pdType);
+                    IsLoaded = PersistentIDConverter != null;
+                }
+            }
+            catch (Exception ex)
+            {
+                IsLoaded = false;
+                IsMainBranch = false;
+                PersistentIDConverter = null;
+                Logger.Error($"Exception thrown while reading data from PartialData:\n{ex}");
+            }
+        }
+
+        Logger.Debug($"PartialData is loaded: {IsLoaded}, Version >= 1.5.2 (main branch): {IsMainBranch}");
         if (IsLoaded && !IsMainBranch)
         {
             Logger.Warn("AWOPartialDataFixer (PartialDataModCompatible) is deprecated, or older version! It will still work but it's recommended to switch to the main branch of PartialData");
         }
-    }
-
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static void Setup()
-    {
-        if (!IL2CPPChainloader.Instance.Plugins.TryGetValue(PLUGIN_GUID, out var info)) return;
-
-        try
-        {
-            IsLoaded = true;
-            IsMainBranch = info.VersionAtLeast("1.5.2");
-
-            var pdAsm = AccessTools.TypeByName("MTFO.Ext.PartialData.JsonConverters.PersistentIDConverter");
-            if (pdAsm != null && typeof(JsonConverter).IsAssignableFrom(pdAsm))
-            {
-                PersistentIDConverter = (JsonConverter?)Activator.CreateInstance(pdAsm);
-            }
-        }
-        catch (Exception ex)
-        {
-            IsLoaded = false;
-            IsMainBranch = false;
-            PersistentIDConverter = null;
-            Logger.Error($"Exception thrown while reading data from PartialData:\n{ex}");
-        }        
     }
 
     public static bool TryGetGUID(string text, out uint guid)
