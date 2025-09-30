@@ -23,7 +23,7 @@ public static class CourseNodeUtil // credits: Dinorush
 
         foreach (var cluster in AIG_NodeCluster.AllNodeClusters)
         {
-            if (cluster == null)
+            if (cluster?.m_courseNode?.m_dimension == null)
                 continue;
 
             if (!_maps.TryGetValue(cluster.m_courseNode.m_dimension.DimensionIndex, out var map))
@@ -38,7 +38,7 @@ public static class CourseNodeUtil // credits: Dinorush
 
         foreach (var cluster in AIG_NodeCluster.AllNodeClusters)
         {
-            if (cluster == null)
+            if (cluster?.m_courseNode?.m_dimension == null)
                 continue;
 
             var map = _maps[cluster.m_courseNode.m_dimension.DimensionIndex];
