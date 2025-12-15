@@ -2,6 +2,7 @@
 using AmorLib.Utils;
 using BepInEx.Unity.IL2CPP;
 using GTFO.API;
+using GTFO.API.Extensions;
 using HarmonyLib;
 using LevelGeneration;
 using UnityEngine;
@@ -25,7 +26,7 @@ internal static class TerminalPatches
 
         foreach (var kvp in ReactorTerminals)
         {
-            if (kvp.Key.TryGetZone(out var zone))
+            if (kvp.Key.TryGetZone(out var zone) && !zone.TerminalsSpawnedInZone.ToManaged().Any(term => term.SyncID == kvp.Value.SyncID))
             {
                 zone.TerminalsSpawnedInZone.Add(kvp.Value);
                 Logger.Debug("Appended reactor terminal to its TerminalsSpawnedInZone");
@@ -38,10 +39,9 @@ internal static class TerminalPatches
         ReactorTerminals.Clear();
     }
 
-
     [HarmonyPatch(typeof(LG_ComputerTerminalCommandInterpreter), nameof(LG_ComputerTerminalCommandInterpreter.ReceiveCommand))]
     [HarmonyPrefix]
-    [HarmonyPriority(Priority.High)]
+    [HarmonyPriority(Priority.VeryHigh)]
     [HarmonyWrapSafe]
     private static void HiddenCommandExecutionFix(LG_ComputerTerminalCommandInterpreter __instance, ref TERM_Command cmd)
     {

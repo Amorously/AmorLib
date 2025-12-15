@@ -14,6 +14,7 @@ public sealed partial class StateReplicator<S> where S : struct
     public bool IsInvalid => ID == 0u;
     public uint ID { get; private set; }
     public LifeTimeType LifeTime { get; private set; }
+    public IStateReplicatorHolder<S>? Holder { get; private set; }
     public S State { get; private set; }
     public S LastState { get; private set; }
     public bool ClientSendStateAllowed { get; set; } = true;
@@ -84,6 +85,7 @@ public sealed partial class StateReplicator<S> where S : struct
         LastState = oldState;
 
         OnStateChanged?.Invoke(oldState, state, isRecall);
+        Holder?.OnStateChange(oldState, state, isRecall);
     }
 
     private void SendDropInState(SNet_Player target)

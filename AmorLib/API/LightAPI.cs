@@ -93,11 +93,13 @@ public static class LightAPI
 
     public static IEnumerable<LightWorker> GetLightWorkersInRange(Vector3 position, float range)
     {
-        return AllLightsMap.Values.Where(light => light.Position.IsWithinSqrDistance(position, range, out _));
+        float sqrRange = range * range;
+        return AllLightsMap.Values.Where(light => light.Position.IsWithinSqrDistance(position, sqrRange));
     }
 
     public static IEnumerable<LightWorker> GetLightWorkersInRange(eDimensionIndex dimension, Vector3 position, float range)
     {
-        return AllLightsMap.Values.Where(light => light.OwnerZone.DimensionIndex == dimension && light.Position.IsWithinSqrDistance(position, range, out _));
+        float sqrRange = range * range;
+        return AllLightsMap.Values.Where(light => light.OwnerZone.DimensionIndex == dimension && light.Position.IsWithinSqrDistance(position, sqrRange));
     }
 }

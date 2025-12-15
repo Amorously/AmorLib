@@ -50,7 +50,7 @@ public sealed partial class StateReplicator<S> where S : struct
     /// If <paramref name="lifeTime"/> is <see cref="LifeTimeType.Permanent"/>, handshaking is disabled.
     /// </remarks>
     /// <returns>A new <see cref="StateReplicator{S}"/> instance if the successful; otherwise, <see langword="null"/>.</returns>
-    public static StateReplicator<S>? Create(uint replicatorID, S startState, LifeTimeType lifeTime)
+    public static StateReplicator<S>? Create(uint replicatorID, S startState, LifeTimeType lifeTime, IStateReplicatorHolder<S>? holder = null)
     {
         if (replicatorID == 0u)
         {
@@ -68,6 +68,7 @@ public sealed partial class StateReplicator<S> where S : struct
         {
             ID = replicatorID,
             LifeTime = lifeTime,
+            Holder = holder,
             State = startState
         };
 

@@ -55,7 +55,7 @@ public sealed class ValueBaseConverter : JsonConverter<ValueBase>
 
             case JsonTokenType.String:
                 var strValue = reader.GetString()?.Trim();
-                if (string.IsNullOrEmpty(strValue)) throw new JsonException("BoolBase string value is null or empty!");
+                if (string.IsNullOrEmpty(strValue)) throw new JsonException("ValueBase string value is null or empty!");
 
                 bool fromDefaultFlag = false;
                 if (strValue.EndsWith("of default", StringComparison.OrdinalIgnoreCase))

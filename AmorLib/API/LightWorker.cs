@@ -103,42 +103,40 @@ public class LightWorker
 
     private void RemoveModifier(LightModifier modifier)
     {
-        var stack = _priorityDict[modifier.Priority];
-        if (_currentNode != modifier.Node)
+        if (!_priorityDict.TryGetValue(modifier.Priority, out var stack))
+            return;
+
+        bool wasCurrent = _currentNode == modifier.Node;
+        stack.Remove(modifier.Node!);
+        modifier.Node = null;
+
+        if (stack.Count == 0)
+            _priorityDict.Remove(modifier.Priority);
+
+        if (!wasCurrent) return;
+
+        if (_priorityDict.Count == 0)
         {
-            stack.Remove(modifier.Node!);
-            modifier.Node = null;
+            _currentNode = null;
             return;
         }
 
-        if (modifier.Node!.Previous != null)
-        {
-            _currentNode = modifier.Node.Previous;
-        }
-        else
-        {
-            _currentNode = _priorityDict.Values.Last(list => list.Count > 0).Last;
-        }
-
-        stack.Remove(modifier.Node);
-        modifier.Node = null;
+        var nextList = _priorityDict.Values.Last(list => list.Count > 0);
+        _currentNode = nextList.Last;
         _currentNode!.Value.Apply();
     }
 
     // If necessary, e.g. cleaning up or resetting lights, might not need it
-    internal void Reset() 
+    internal void Reset()
     {
-        foreach (var stack in _priorityDict.Values)
-        {
-            foreach (var modifier in stack)
-            {
-                modifier.Remove();
-            }
-        }
+        var toRemove = _priorityDict.Values.SelectMany(list => list).ToList();
+        foreach (var modifier in toRemove)
+            modifier.Remove();
 
         _priorityDict.Clear();
         _origLightMod.Register();
     }
+
 
     class LightModifier : ILightModifier
     {        

@@ -106,4 +106,13 @@ public static class GameObjectPlusExtensions
         sqrDistance = (a - b).sqrMagnitude;
         return sqrDistance <= sqrThreshold;
     }
+
+    /// <summary>
+    /// Compares the square magnitude of two <see cref="Vector3"/> values to the square of <paramref name="sqrThreshold"/>.
+    /// </summary>
+    public static bool IsWithinSqrDistance(this Vector3 a, Vector3 b, float sqrThreshold)
+    {
+        float sqrDistance = (a - b).sqrMagnitude;
+        return sqrDistance <= sqrThreshold;
+    }
 }

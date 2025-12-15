@@ -12,7 +12,7 @@ public static class JsonSerializerUtil
     /// <returns>A default <see cref="JsonSerializerOptions"/> instance with the specified converters added.</returns>
     public static JsonSerializerOptions CreateDefaultSettings(bool useLocalizedText = true, bool usePartialData = false, bool useInjectLib = false)
     {
-        JsonSerializerOptions setting = useLocalizedText ? new(JsonSerializer.DefaultSerializerSettingsWithLocalizedText) : new(JsonSerializer.DefaultSerializerSettings);
+        var setting = new JsonSerializerOptions(useLocalizedText ? JsonSerializer.DefaultSerializerSettingsWithLocalizedText : JsonSerializer.DefaultSerializerSettings);
 
         if (usePartialData && PData_Wrapper.IsLoaded)
             setting.Converters.Add(PData_Wrapper.PersistentIDConverter!);
