@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 namespace AmorLib;
 
-[BepInPlugin("Amor.AmorLib", "AmorLib", "1.0.7")]
+[BepInPlugin("Amor.AmorLib", "AmorLib", "1.1.0")]
 [BepInDependency("dev.gtfomodding.gtfo-api", BepInDependency.DependencyFlags.HardDependency)]
 [BepInDependency(InjectLib_Wrapper.PLUGIN_GUID, BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency(PData_Wrapper.PLUGIN_GUID, BepInDependency.DependencyFlags.SoftDependency)]

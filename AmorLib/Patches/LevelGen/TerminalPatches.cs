@@ -87,7 +87,6 @@ internal static class TerminalPatches
 
     [HarmonyPatch(typeof(LG_ComputerTerminal), nameof(LG_ComputerTerminal.SpawnNode), MethodType.Getter)]
     [HarmonyPrefix]
-    [HarmonyWrapSafe]
     private static bool ReactorTerminalSpawnNodeFix(LG_ComputerTerminal __instance, ref AIG_CourseNode __result) // ripped from EOS
     {
         if (__instance.ConnectedReactor != null && __instance.m_terminalItem.SpawnNode == null)

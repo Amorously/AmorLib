@@ -45,7 +45,7 @@ public static class GlobalIndexUtil
     {
         if (!Builder.CurrentFloor.TryGetZoneByLocalIndex(dimension, layer, localIndex, out zone))
         {
-            Logger.Error("Unable to find zone in level!");
+            Logger.Error($"Unable to find zone in level! (Dimension: {dimension}, Layer: {layer}, LocalIndex: {localIndex})");
             return false;
         }
         return true;
