@@ -24,7 +24,7 @@ public abstract class SyncedEvent<S> where S : struct
 
     public void Send(S packetData, SNet_Player? target = null, SNet_ChannelType priority = SNet_ChannelType.GameNonCritical)
     {
-        if (target is not null)
+        if (target != null)
         {
             NetworkAPI.InvokeEvent(EventName, packetData, target, priority);
         }

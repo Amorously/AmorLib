@@ -52,7 +52,7 @@ public abstract class GlobalBase
 
     private void OnAfterBuildBatch(LG_Factory.BatchName batch)
     {
-        if (batch == LG_Factory.BatchName.Geomorphs)
+        if (batch == LG_Factory.BatchName.Geomorphs) // probably safe now
         {
             Dimension = Dimension.GetDimension(_dimIndex, out var d) ? d : null;
             Zone = _tuple.TryGetZone(out var z) ? z : null;
