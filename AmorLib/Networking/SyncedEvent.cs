@@ -1,4 +1,5 @@
-﻿using GTFO.API;
+﻿using BepInEx;
+using GTFO.API;
 using SNetwork;
 
 namespace AmorLib.Networking;
@@ -7,7 +8,7 @@ public abstract class SyncedEvent<S> where S : struct
 {
     public delegate void ReceiveHandler(S packet);
 
-    public abstract string Prefix { get; }
+    public virtual string Prefix => string.Empty;
     public abstract string GUID { get; }
     public bool IsSetup { get; private set; } = false;
     public string EventName { get; private set; } = string.Empty;
@@ -17,7 +18,7 @@ public abstract class SyncedEvent<S> where S : struct
         if (IsSetup)
             return;
 
-        EventName = $"SE-{Prefix}-{GUID}";
+        EventName = Prefix.IsNullOrWhiteSpace() ? $"SE-{GUID}" : $"SE-{Prefix}-{GUID}";
         NetworkAPI.RegisterEvent<S>(EventName, ReceiveClient_Callback);
         IsSetup = true;
     }
