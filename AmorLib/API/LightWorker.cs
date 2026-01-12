@@ -29,6 +29,9 @@ public class LightWorker
     private ILightModifier _origLightMod = null!;
 
     public Vector3 Position => Light.GetPosition();
+    public Color CurrentColor => Light.m_color; 
+    public float CurrentIntensity => Light.m_intensity;
+    public bool CurrentEnabled { get; private set; }
 
     public LightWorker(LG_Zone zone, AIG_CourseNode node, LG_Light light, int id, float intensity)
     {
@@ -44,7 +47,8 @@ public class LightWorker
         Animator = Light.gameObject.GetComponent<LG_LightAnimator>();
         OrigColor = Light.m_color;        
         OrigIntensity = Light.m_intensity;
-        OrigEnabled = Light.gameObject.active;
+        OrigEnabled = !Light.DisabledFromSettings && Light.isActiveAndEnabled;
+        CurrentEnabled = OrigEnabled;
         _origLightMod = AddModifier(OrigColor, OrigIntensity, OrigEnabled, OrigPriority);
     }
     
@@ -54,7 +58,11 @@ public class LightWorker
 
     private void ChangeLightIntensity(float intensity) => Light.ChangeIntensity(intensity);
 
-    private void SetLightEnabled(bool enabled) => Light.SetEnabled(enabled);
+    private void SetLightEnabled(bool enabled)  
+    { 
+        Light.SetEnabled(enabled); 
+        CurrentEnabled = enabled;
+    }
 
     /// <summary>
     /// Toggles the vanilla light flicker animation.

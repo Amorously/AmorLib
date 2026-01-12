@@ -143,6 +143,11 @@ public static class CourseNodeUtil // credits: Dinorush
         return bestNode;
     }
 
+    public static AIG_CourseNode GetCourseNode(Vector3 position)
+    {
+        return GetCourseNode(position, Dimension.GetDimensionFromPos(position)?.DimensionIndex ?? eDimensionIndex.Reality);
+    }
+
     public static AIG_CourseNode GetCourseNode(Vector3 position, eDimensionIndex dimensionIndex)
     {
         if (!_maps.TryGetValue(dimensionIndex, out var map))
