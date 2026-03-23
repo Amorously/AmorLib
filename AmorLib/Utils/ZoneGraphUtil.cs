@@ -5,10 +5,10 @@ using GTFO.API;
 using LevelGeneration;
 using Player;
 
-namespace AmorLib.Utils.PlayerZoneGraph;
+namespace AmorLib.Utils;
 
 [CallConstructorOnLoad]
-public sealed class ZoneGraph // contributed by: Dinorush
+public sealed class ZoneGraphUtil // contributed by: Dinorush
 {
     public static event Action? OnReachableUpdate;
 
@@ -31,14 +31,14 @@ public sealed class ZoneGraph // contributed by: Dinorush
 
     public const ushort NoGroup = 0;
 
-    internal static readonly ZoneGraph Current = new();
+    internal static readonly ZoneGraphUtil Current = new();
 
     private readonly Dictionary<int, ZoneNode> _zoneToNode = new();
     private readonly Dictionary<int, AreaNode> _areaToNode = new();
     private readonly Dictionary<int, ushort> _playerToGroup = new();
     private ushort _lastGroup = 0;
 
-    static ZoneGraph()
+    static ZoneGraphUtil()
     {
         LevelAPI.OnBuildDone += Current.BuildZoneGraph;
         LevelAPI.OnLevelCleanup += Current.Cleanup;

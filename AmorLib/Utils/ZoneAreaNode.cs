@@ -1,6 +1,47 @@
 ﻿using LevelGeneration;
 
-namespace AmorLib.Utils.PlayerZoneGraph;
+namespace AmorLib.Utils;
+
+public sealed class ZoneNode
+{
+    public readonly LG_Zone Zone;
+    public AreaNode[] Areas { get; private set; } = null!;
+    private readonly Dictionary<ushort, int> _groups = new();
+    public IReadOnlyCollection<ushort> Groups => _groups.Keys;
+
+    public ZoneNode(LG_Zone zone)
+    {
+        Zone = zone;
+    }
+
+    internal void OnNodesCreated()
+    {
+        List<AreaNode> children = new(Zone.m_areas.Count);
+        foreach (var area in Zone.m_areas)
+            children.Add(ZoneGraphUtil.GetAreaNode(area));
+        Areas = children.ToArray();
+    }
+
+    public bool IsReachable(ushort group) => _groups.ContainsKey(group);
+    public bool IsReachable() => _groups.Count > 0;
+
+    internal void Reset()
+    {
+        _groups.Clear();
+    }
+
+    internal void OnAreaReachable(ushort newGroup, ushort oldGroup)
+    {
+        if (_groups.TryGetValue(oldGroup, out var count) && --count == 0)
+            _groups.Remove(oldGroup);
+
+        if (newGroup == ZoneGraphUtil.NoGroup) return;
+
+        count = _groups.GetValueOrDefault(newGroup);
+        _groups[newGroup] = count + 1;
+    }
+}
+
 
 public sealed class AreaNode
 {
@@ -23,7 +64,7 @@ public sealed class AreaNode
 
     public readonly LG_Area Area;
 
-    public ushort Group { get; private set; } = ZoneGraph.NoGroup;
+    public ushort Group { get; private set; } = ZoneGraphUtil.NoGroup;
 
     public ZoneNode Zone { get; private set; } = null!;
     public AreaEdge[] Edges { get; private set; } = null!;
@@ -34,11 +75,11 @@ public sealed class AreaNode
     }
 
     public bool IsReachable(ushort group) => Group == group && group > 0;
-    public bool IsReachable() => Group != ZoneGraph.NoGroup;
+    public bool IsReachable() => Group != ZoneGraphUtil.NoGroup;
 
     internal void OnNodesCreated()
     {
-        Zone = ZoneGraph.GetZoneNode(Area.m_zone);
+        Zone = ZoneGraphUtil.GetZoneNode(Area.m_zone);
         List<AreaEdge> edges = new();
         foreach (var gate in Area.m_gates)
         {
@@ -50,14 +91,14 @@ public sealed class AreaNode
 
             if (area == null || gate.ExpanderStatus == LG_ZoneExpanderStatus.Blocked) continue;
 
-            edges.Add(new(gate, ZoneGraph.GetAreaNode(area)));
+            edges.Add(new(gate, ZoneGraphUtil.GetAreaNode(area)));
         }
         Edges = edges.ToArray();
     }
 
     internal void Reset()
     {
-        Group = ZoneGraph.NoGroup;
+        Group = ZoneGraphUtil.NoGroup;
     }
 
     internal void SetGroup(ushort group)

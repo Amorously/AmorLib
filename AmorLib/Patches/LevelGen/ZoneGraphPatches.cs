@@ -1,5 +1,5 @@
 ﻿using AIGraph;
-using AmorLib.Utils.PlayerZoneGraph;
+using AmorLib.Utils;
 using HarmonyLib;
 using LevelGeneration;
 using Player;
@@ -22,7 +22,7 @@ internal static class ZoneGraphPatches
     {
         var node = __instance.CourseNode;
         if (node == null || __state == node) return;
-        ZoneGraph.Current.Internal_OnPlayerNodeChanged(__instance, __state);
+        ZoneGraphUtil.Current.Internal_OnPlayerNodeChanged(__instance, __state);
     }
 
     [HarmonyPatch(typeof(LG_Gate), nameof(LG_Gate.IsTraversable), MethodType.Setter)]
@@ -36,6 +36,6 @@ internal static class ZoneGraphPatches
     [HarmonyPostfix]
     private static void Post_GateIsTraversable(LG_Gate __instance, bool __state)
     {
-        ZoneGraph.Current.Internal_OnDoorStateChanged(__instance, !__state);
+        ZoneGraphUtil.Current.Internal_OnDoorStateChanged(__instance, !__state);
     }
 }
