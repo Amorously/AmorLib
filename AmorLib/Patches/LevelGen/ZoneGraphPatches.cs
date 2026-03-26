@@ -36,6 +36,7 @@ internal static class ZoneGraphPatches
     [HarmonyPostfix]
     private static void Post_GateIsTraversable(LG_Gate __instance, bool __state)
     {
-        ZoneGraphUtil.Current.Internal_OnDoorStateChanged(__instance, !__state);
+        if (__state !=  __instance.IsTraversable && __instance.ExpanderStatus == LG_ZoneExpanderStatus.Connected)
+            ZoneGraphUtil.Current.Internal_OnDoorStateChanged(__instance, !__state);
     }
 }
