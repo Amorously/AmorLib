@@ -40,6 +40,7 @@ public sealed class ZoneGraphUtil // contributed by: Dinorush
 
     static ZoneGraphUtil()
     {
+        LevelAPI.OnBuildStart += () => LG_Area.s_areaUIDCounter = 0;
         LevelAPI.OnBuildDone += Current.BuildZoneGraph;
         LevelAPI.OnLevelCleanup += Current.Cleanup;
         SNetEvents.OnCheckpointReload += Current.RefreshOnCheckpoint;
@@ -49,9 +50,9 @@ public sealed class ZoneGraphUtil // contributed by: Dinorush
     {
         foreach (var zone in Builder.CurrentFloor.allZones)
         {
-            _zoneToNode.Add(zone.ID, new(zone));
+            _zoneToNode.TryAdd(zone.ID, new(zone));
             foreach (var area in zone.m_areas)
-                _areaToNode.Add(area.UID, new(area));
+                _areaToNode.TryAdd(area.UID, new(area));
         }
 
         foreach (var zone in _zoneToNode.Values)
@@ -158,7 +159,6 @@ public sealed class ZoneGraphUtil // contributed by: Dinorush
 
         var from = GetAreaNode(gate.m_linksFrom);
         var to = GetAreaNode(gate.m_linksTo);
-
         // Update graph edges to match door state.
         from.UpdateEdges();
         to.UpdateEdges();
