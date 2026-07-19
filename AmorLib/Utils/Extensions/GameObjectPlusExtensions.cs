@@ -36,6 +36,15 @@ public static class GameObjectPlusExtensions
     }
 
     /// <summary>
+    /// Checks if a <see cref="GameObject"/> has a component of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <returns><see langword="true"/> if the <see cref="GameObject"/> has a component of type <typeparamref name="T"/>; otherwise, <see langword="false"/>.</returns>
+    public static bool HasComponent<T>(this GameObject go) where T : Component
+    {
+        return go.GetComponent<T>() != null;
+    }
+
+    /// <summary>
     /// Returns the full hierarchical path of a <see cref="GameObject"/> in the scene.
     /// </summary>
     public static string GetFullPath(this GameObject go)
@@ -114,5 +123,22 @@ public static class GameObjectPlusExtensions
     {
         float sqrDistance = (a - b).sqrMagnitude;
         return sqrDistance <= sqrThreshold;
+    }
+
+    /// <summary>
+    /// Converts a <see cref="Vector3"/> representing Euler angles to a <see cref="Quaternion"/>.
+    /// </summary>
+    public static Quaternion ToQuaternion(this Vector3 rotation)
+    {
+        return Quaternion.Euler(rotation);
+    }
+    
+    /// <summary>
+    /// Sets the position, rotation, and scale of a <see cref="Transform"/>.
+    /// </summary>
+    public static void SetPositionRotationScale(this Transform transform, Vector3 position, Vector3 rotation, Vector3 scale)
+    {
+        transform.SetPositionAndRotation(position, rotation.ToQuaternion());
+        transform.localScale = scale;
     }
 }
