@@ -1,4 +1,5 @@
 ﻿using GameData;
+using GTFO.API;
 using LevelGeneration;
 using System.Diagnostics.CodeAnalysis;
 
@@ -6,6 +7,45 @@ namespace AmorLib.Utils;
 
 public static class GlobalIndexUtil
 {
+    internal static readonly List<WeakReference<GlobalBase>> BaseInstances = new();
+
+    static GlobalIndexUtil()
+    {
+        LevelAPI.OnAfterBuildBatch += OnAfterBuildBatch;
+        LevelAPI.OnLevelCleanup += OnLevelCleanup;
+    }
+
+    private static void OnAfterBuildBatch(LG_Factory.BatchName batch)
+    {
+        if (batch == LG_Factory.BatchName.Geomorphs)
+        {
+            foreach (var weakRef in BaseInstances)
+            {
+                if (weakRef.TryGetTarget(out var instance))
+                {
+                    instance.Dimension = Dimension.GetDimension(instance.DimensionIndex, out var d) ? d : null;
+                    instance.Zone = TryGetZone(instance.DimensionIndex, instance.Layer, instance.LocalIndex, out var z) ? z : null;
+                }
+            }
+        }
+    }
+    
+    private static void OnLevelCleanup()
+    {
+        foreach (var weakRef in BaseInstances)
+        {
+            if (weakRef.TryGetTarget(out var instance))
+            {
+                instance.Dimension = null;
+                instance.Zone = null;
+            }
+            else
+            {
+                BaseInstances.Remove(weakRef);
+            }
+        }
+    }
+
     public static (int dimension, int layer, int zone) ToIntTuple(this LG_Zone zone)
     {
         return ToIntTuple(zone.DimensionIndex, zone.Layer.m_type, zone.LocalIndex);        
@@ -45,10 +85,12 @@ public static class GlobalIndexUtil
     {
         if (!Builder.CurrentFloor.TryGetZoneByLocalIndex(dimension, layer, localIndex, out zone))
         {
-            Logger.Error($"Unable to find zone in level! (Dimension: {dimension}, Layer: {layer}, LocalIndex: {localIndex})");
+            if (GameStateManager.CurrentStateName == eGameStateName.Generating)
+            {
+                Logger.Error($"Unable to find zone in level! (Dimension: {dimension}, Layer: {layer}, LocalIndex: {localIndex})");
+            }
             return false;
         }
         return true;
     }
 }
-

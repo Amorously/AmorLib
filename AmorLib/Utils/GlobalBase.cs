@@ -1,5 +1,4 @@
 ﻿using GameData;
-using GTFO.API;
 using LevelGeneration;
 using System.Text.Json.Serialization;
 
@@ -39,9 +38,6 @@ public abstract class GlobalBase
     public (int dimension, int layer, int zone) IntTuple { get { Refresh(); return _tuple; } }
     private (int dim, int layer, int zone) _tuple;
 
-    [JsonIgnore]
-    public virtual bool IsTemporary { get; set; } = false;
-
     public Dimension? Dimension;
     public LG_Zone? Zone;
     private bool _isDirty = true;
@@ -49,29 +45,7 @@ public abstract class GlobalBase
     protected GlobalBase()
     {
         Refresh();
-        LevelAPI.OnAfterBuildBatch += OnAfterBuildBatch;
-        LevelAPI.OnLevelCleanup += OnLevelCleanup;
-    }
-
-    private void OnAfterBuildBatch(LG_Factory.BatchName batch)
-    {
-        if (batch == LG_Factory.BatchName.Geomorphs) // probably safe now
-        {
-            Dimension = Dimension.GetDimension(DimensionIndex, out var d) ? d : null;
-            Zone = GlobalIndexUtil.TryGetZone(DimensionIndex, Layer, LocalIndex, out var z) ? z : null;
-        }
-    }
-    
-    private void OnLevelCleanup()
-    {
-        Dimension = null;
-        Zone = null;
-
-        if (IsTemporary)
-        {
-            LevelAPI.OnAfterBuildBatch -= OnAfterBuildBatch;
-            LevelAPI.OnLevelCleanup -= OnLevelCleanup;
-        }
+        GlobalIndexUtil.BaseInstances.Add(new(this));
     }
 
     private void MarkDirty() => _isDirty = true;
