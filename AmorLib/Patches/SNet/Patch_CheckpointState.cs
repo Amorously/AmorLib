@@ -8,11 +8,21 @@ internal static class Patch_CheckpointState
 {
     [HarmonyPostfix]
     [HarmonyWrapSafe]
-    public static void Post_CheckpointStateChange(pCheckpointState newState)
+    public static void Post_CheckpointStateChange(pCheckpointState oldState, pCheckpointState newState, bool isRecall)
     {
-        if (newState.lastInteraction == eCheckpointInteractionType.ReloadCheckpoint)
+        if (!oldState.isReloadingCheckpoint && !newState.isReloadingCheckpoint)
+        {
+            // Ignore cases:
+            // Client syncs on drop with isRecall: true.
+            // Client runs a redundant StoreCheckpoint call w/ no changes prior to any change.
+            if (isRecall || oldState.doorLockPosition == newState.doorLockPosition)
+                return;
+
+            SNetEvents.CheckpointReloaded();
+        }
+        else if (oldState.isReloadingCheckpoint && isRecall)
         {
             SNetEvents.CheckpointReloaded();
-        }        
+        }
     }
 }
