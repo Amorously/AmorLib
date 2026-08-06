@@ -29,21 +29,19 @@ public static class GlobalIndexUtil
             }
         }
     }
-    
+
     private static void OnLevelCleanup()
     {
-        foreach (var weakRef in BaseInstances)
+        BaseInstances.RemoveAll(weakRef =>
         {
             if (weakRef.TryGetTarget(out var instance))
             {
                 instance.Dimension = null;
                 instance.Zone = null;
+                return false; 
             }
-            else
-            {
-                BaseInstances.Remove(weakRef);
-            }
-        }
+            return true;
+        });
     }
 
     public static (int dimension, int layer, int zone) ToIntTuple(this LG_Zone zone)

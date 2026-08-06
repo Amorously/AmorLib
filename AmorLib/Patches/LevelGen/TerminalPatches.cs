@@ -94,6 +94,13 @@ internal static class TerminalPatches
             __result = __instance.ConnectedReactor.SpawnNode;
             return false;
         }
+
+        //var node = __instance.m_terminalItem.SpawnNode ?? CourseNodeUtil.GetCourseNode(__instance.m_position);
+        //if (node != null)
+        //{
+        //    __result = node;
+        //    return false;
+        //}
         return true;
     }
 

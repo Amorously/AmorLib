@@ -18,7 +18,7 @@ internal static class Patch_CheckpointState
             if (isRecall || oldState.doorLockPosition == newState.doorLockPosition)
                 return;
 
-            SNetEvents.CheckpointReloaded();
+            SNetEvents.CheckpointReached();
         }
         else if (oldState.isReloadingCheckpoint && isRecall)
         {
