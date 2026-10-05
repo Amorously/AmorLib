@@ -170,6 +170,7 @@ public static class CourseNodeUtil // credits: Dinorush
         return map.GetNodes(position);
     }
 
+    #region DIMENSION_MAP
     class DimensionMap
     {
         private const float IndexSize = 4f;
@@ -270,4 +271,5 @@ public static class CourseNodeUtil // credits: Dinorush
             return null!;
         }
     }
+    #endregion
 }

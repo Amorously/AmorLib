@@ -1,6 +1,5 @@
 ﻿using Agents;
 using AIGraph;
-using AmorLib.Events;
 using GTFO.API;
 using LevelGeneration;
 using Player;
@@ -56,6 +55,7 @@ public sealed class ZoneGraphUtil // contributed by: Dinorush
     /// </summary>
     public static bool IsReady { get; private set; } = false;
 
+    #region GET_ZONE/AREA_NODE
     /// <summary>
     /// Gets the corresponding <see cref="ZoneNode"/> for the zone that the agent is in.
     /// </summary>
@@ -80,12 +80,14 @@ public sealed class ZoneGraphUtil // contributed by: Dinorush
     /// Gets the corresponding <see cref="AreaNode"/> for the area.
     /// </summary>
     public static AreaNode GetAreaNode(LG_Area area) => Current._areaToNode[area.UID];
+    #endregion
 
     /// <summary>
     /// Gets the group IDs tied to the player.
     /// </summary>
     public static ZoneGraphGroup GetPlayerGroup(PlayerAgent player) => Current._playerToGroup.GetValueOrDefault(player.PlayerSlotIndex);
 
+    #region IS_REACHABLE
     /// <summary>
     /// Gets whether there is an open path from <paramref name="courseNode"/> to <paramref name="player"/>.
     /// </summary>
@@ -125,7 +127,9 @@ public sealed class ZoneGraphUtil // contributed by: Dinorush
     /// <param name="zone">The zone to initiate the check from.</param>
     /// <returns><see langword="true"/> if there is an open path from any room in <paramref name="zone"/> to any player, otherwise <see langword="false"/>.</returns>
     public static bool IsReachable(LG_Zone zone) => GetZoneNode(zone).IsReachable();
+    #endregion
 
+    #region IS_ZONE_REACHABLE
     /// <summary>
     /// Gets whether there is an open security door path from <paramref name="courseNode"/> to <paramref name="player"/>.
     /// </summary>
@@ -165,6 +169,7 @@ public sealed class ZoneGraphUtil // contributed by: Dinorush
     /// <param name="zone">The zone to initiate the check from.</param>
     /// <returns><see langword="true"/> if there is an open security door path from <paramref name="zone"/> to any player, otherwise <see langword="false"/>.</returns>
     public static bool IsZoneReachable(LG_Zone zone) => GetZoneNode(zone).IsZoneReachable();
+    #endregion
 
     /// <summary>
     /// ID that represents no group.
@@ -183,7 +188,7 @@ public sealed class ZoneGraphUtil // contributed by: Dinorush
         LevelAPI.OnBuildStart += () => LG_Area.s_areaUIDCounter = 0;
         LevelAPI.OnBuildDone += Current.BuildZoneGraph;
         LevelAPI.OnLevelCleanup += Current.Cleanup;
-        SNetEvents.OnCheckpointReload += Current.RefreshOnCheckpoint;
+        EventAPI.OnCheckpointReloaded += Current.RefreshOnCheckpoint;
     }
 
     // Debug logging - call in static constructor when needed for testing
