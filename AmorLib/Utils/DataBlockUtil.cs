@@ -8,7 +8,7 @@ public static class DataBlockUtil
 {
     public static bool TryGetBlock<T>(string name, [MaybeNullWhen(false)] out T block) where T : GameDataBlockBase<T>
     {
-        if (PData_Wrapper.TryGetGUID(name, out uint id))
+        if (PartialData_Wrapper.TryGetGUID(name, out uint id))
             return TryGetBlock(id, out block);
 
         block = GameDataBlockBase<T>.GetBlock(name);
@@ -19,5 +19,5 @@ public static class DataBlockUtil
     {
         block = GameDataBlockBase<T>.GetBlock(id);
         return block != null && block.internalEnabled;
-    }    
+    }
 }

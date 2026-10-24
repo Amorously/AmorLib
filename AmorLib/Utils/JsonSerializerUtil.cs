@@ -14,8 +14,8 @@ public static class JsonSerializerUtil
     {
         var setting = new JsonSerializerOptions(useLocalizedText ? JsonSerializer.DefaultSerializerSettingsWithLocalizedText : JsonSerializer.DefaultSerializerSettings);
 
-        if (usePartialData && PData_Wrapper.IsLoaded)
-            setting.Converters.Add(PData_Wrapper.PersistentIDConverter!);
+        if (usePartialData && PartialData_Wrapper.IsLoaded)
+            setting.Converters.Add(PartialData_Wrapper.PersistentIDConverter!);
 
         if (useInjectLib && InjectLib_Wrapper.IsLoaded)
             setting.Converters.Add(InjectLib_Wrapper.InjectLibConverter!);

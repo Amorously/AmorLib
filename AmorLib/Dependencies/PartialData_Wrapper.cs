@@ -7,14 +7,14 @@ using System.Text.Json.Serialization;
 namespace AmorLib.Dependencies;
 
 [CallConstructorOnLoad]
-public static class PData_Wrapper
+public static class PartialData_Wrapper
 {
     public const string PLUGIN_GUID = "MTFO.Extension.PartialBlocks";
     public static bool IsLoaded { get; private set; } = false;
     public static bool IsMainBranch { get; private set; } = false;
     public static JsonConverter? PersistentIDConverter { get; private set; } = null;
 
-    static PData_Wrapper()
+    static PartialData_Wrapper()
     {
         if (IL2CPPChainloader.Instance.Plugins.TryGetValue(PLUGIN_GUID, out var info))
         {
@@ -64,4 +64,15 @@ public static class PData_Wrapper
         }
         return 0u;
     }
+}
+
+[Obsolete("Renamed to 'PartialData_Wrappper'")]
+public static class PData_Wrapper
+{
+    public const string PLUGIN_GUID = PartialData_Wrapper.PLUGIN_GUID;
+    public static bool IsLoaded => PartialData_Wrapper.IsLoaded;
+    public static bool IsMainBranch => PartialData_Wrapper.IsMainBranch;
+    public static JsonConverter? PersistentIDConverter => PartialData_Wrapper.PersistentIDConverter;
+
+    public static bool TryGetGUID(string text, out uint guid) => PartialData_Wrapper.TryGetGUID(text, out guid);
 }
