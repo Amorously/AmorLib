@@ -37,7 +37,7 @@ public static class PartialData_Wrapper
             }
         }
 
-        Logger.Debug($"PartialData is loaded: {IsLoaded}, Version >= 1.5.2 (main branch): {IsMainBranch}");
+        Logger.Debug($"PartialData is loaded: {IsLoaded}, Version >= 1.5.2: {IsMainBranch}");
         if (IsLoaded && !IsMainBranch)
         {
             Logger.Warn("AWOPartialDataFixer (PartialDataModCompatible) is deprecated, or older version! It will still work but it's recommended to switch to the main branch of PartialData");

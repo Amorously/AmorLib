@@ -8,9 +8,12 @@ public static class MTFO_Wrapper
 {
     public const string PLUGIN_GUID = "com.dak.MTFO";
     public static bool IsLoaded { get; private set; } = false;
+    public static bool HasGameDataPath { get; private set; } = false;
+    public static bool IsPluginGameDataPath { get; private set; } = false;
     public static string GameDataPath { get; private set; } = string.Empty;
-    public static string CustomPath { get; private set; } = string.Empty;
     public static bool HasCustomContent { get; private set; } = false;
+    public static string CustomPath { get; private set; } = string.Empty;
+    public static bool IsHotReloadEnabled { get; private set; } = false;
 
     static MTFO_Wrapper()
     {
@@ -25,8 +28,11 @@ public static class MTFO_Wrapper
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static void Init()
     {
+        HasGameDataPath = MTFO.Managers.ConfigManager.HasGameDataPath;
+        IsPluginGameDataPath = MTFO.Managers.ConfigManager.IsPluginGameDataPath;
         GameDataPath = MTFO.Managers.ConfigManager.GameDataPath;
-        CustomPath = MTFO.Managers.ConfigManager.CustomPath;
         HasCustomContent = MTFO.Managers.ConfigManager.HasCustomContent;
+        CustomPath = MTFO.Managers.ConfigManager.CustomPath;
+        IsHotReloadEnabled = MTFO.Managers.ConfigManager.IsHotReloadEnabled;
     }
 }

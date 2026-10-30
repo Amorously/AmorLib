@@ -1,4 +1,5 @@
-﻿using GTFO.API.Utilities;
+﻿using GTFO.API;
+using GTFO.API.Utilities;
 using SNetwork;
 
 namespace AmorLib.Events;
@@ -15,11 +16,15 @@ public static class SNetEvents
     public static event Action? OnCheckpointReached;
 
     [Obsolete("Implemented in GTFO-API")]
-    public static event Action? OnCheckpointReload;        
+    public static event Action? OnCheckpointReload;  
+    
+    static SNetEvents()
+    {
+        EventAPI.OnCheckpointReached += OnCheckpointReached;
+        EventAPI.OnCheckpointReloaded += OnCheckpointReload;
+    }
 
     internal static void BufferCaptured(eBufferType bufferType) => SafeInvoke.Invoke(OnBufferCapture, bufferType);
     internal static void BufferRecalled(eBufferType bufferType) => SafeInvoke.Invoke(OnBufferRecall, bufferType);
     internal static void RecallDone() => SafeInvoke.Invoke(OnRecallDone);
-    internal static void CheckpointReached() => SafeInvoke.Invoke(OnCheckpointReached);
-    internal static void CheckpointReloaded() => SafeInvoke.Invoke(OnCheckpointReload);    
 }

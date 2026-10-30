@@ -35,9 +35,7 @@ internal static class LightsPatches
     private static void Post_ZoneBuild(LG_BuildZoneLightsJob __instance, bool __result, List<LightWorker>? __state)
     {
         if (__instance.m_zone == null || !__result || __state == null)
-        {
-            return;
-        }
+            return;        
 
         foreach (var worker in __state)
         {

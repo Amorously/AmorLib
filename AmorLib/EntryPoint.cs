@@ -15,9 +15,10 @@ internal sealed class EntryPoint : BasePlugin
 {
     public override void Load()
     {
+        Logger.MLS = Log;
         new Harmony("Amor.AmorLib").PatchAll();
         CallAllAutoConstructors();
-        Logger.Info("AmorLib is done loading!");
+        Logger.Message("AmorLib is done loading!");
     }
 
     private void CallAllAutoConstructors()

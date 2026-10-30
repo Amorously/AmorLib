@@ -17,20 +17,13 @@ public static class LightAPI
     static LightAPI()
     {        
         LevelAPI.OnAfterBuildBatch += OnAfterZoneLightsBatch;
-        LevelAPI.OnLevelCleanup += OnLevelCleanup;
-    }
-
-    private static void OnLevelCleanup()
-    {
-        AllLightsMap.Clear();
+        LevelAPI.OnLevelCleanup += AllLightsMap.Clear;
     }
     
     private static void OnAfterZoneLightsBatch(LG_Factory.BatchName batch)
     {
         if (batch == LG_Factory.BatchName.ZoneLights)
-        {
-            Logger.Debug($"All LightWorkers are setup. Count: {AllLightsMap.Count}");
-        }
+            Logger.Debug($"All LightWorkers are setup. Count: {AllLightsMap.Count}");        
     }
 
     public static LightWorker? GetSpecificLightWorker(int instanceID)
