@@ -6,6 +6,23 @@ using Player;
 
 namespace AmorLib.Utils;
 
+/// <summary>Determines what type of layer to check reachability on.</summary>
+public enum GraphLayer
+{
+    /// <summary>Check along all doors.</summary>
+    Area,
+    /// <summary>Check along security doors.</summary>
+    Zone
+}
+
+/// <summary>Determines what type of reachablility to use.</summary>
+public enum ReachableMode
+{
+    Traversable = 0,
+    /// <summary>Include opening and closing doors.</summary>
+    Changing = 1
+}
+
 [CallConstructorOnLoad]
 /// <summary>Contains functions to get whether a room is reachable with fast performance.</summary>
 public sealed class ZoneGraphUtil // contributed by: Dinorush
