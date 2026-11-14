@@ -30,15 +30,27 @@ public sealed class ZoneGraphUtil // contributed by: Dinorush
     /// <summary>
     /// Gets whether there is an open path from <paramref name="courseNode"/> to <paramref name="player"/>.
     /// </summary>
-    public static bool IsReachable(PlayerAgent player, AIG_CourseNode courseNode, GraphLayer layer = GraphLayer.Area, ReachableMode mode = ReachableMode.Traversable) => GetManager(layer).IsReachable(player, courseNode, mode);
+    public static bool IsReachable(PlayerAgent player, AIG_CourseNode courseNode, GraphLayer layer = GraphLayer.Area, ReachableMode mode = ReachableMode.Traversable) => IsReachable(player.PlayerSlotIndex, courseNode, layer, mode);
     /// <summary>
     /// Gets whether there is an open path from <paramref name="area"/> to <paramref name="player"/>.
     /// </summary>
-    public static bool IsReachable(PlayerAgent player, LG_Area area, GraphLayer layer = GraphLayer.Area, ReachableMode mode = ReachableMode.Traversable) => GetManager(layer).IsReachable(player, area, mode);
+    public static bool IsReachable(PlayerAgent player, LG_Area area, GraphLayer layer = GraphLayer.Area, ReachableMode mode = ReachableMode.Traversable) => IsReachable(player.PlayerSlotIndex, area, layer, mode);
     /// <summary>
     /// Gets whether there is an open path from <paramref name="zone"/> to <paramref name="player"/>.
     /// </summary>
-    public static bool IsReachable(PlayerAgent player, LG_Zone zone, ReachableMode mode = ReachableMode.Traversable) => GetManager(GraphLayer.Zone).IsReachable(player, zone, mode);
+    public static bool IsReachable(PlayerAgent player, LG_Zone zone, ReachableMode mode = ReachableMode.Traversable) => IsReachable(player.PlayerSlotIndex, zone, mode);
+    /// <summary>
+    /// Gets whether there is an open path from <paramref name="courseNode"/> to the player in <paramref name="playerSlotIndex"/>.
+    /// </summary>
+    public static bool IsReachable(int playerSlotIndex, AIG_CourseNode courseNode, GraphLayer layer = GraphLayer.Area, ReachableMode mode = ReachableMode.Traversable) => GetManager(layer).IsReachable(playerSlotIndex, courseNode, mode);
+    /// <summary>
+    /// Gets whether there is an open path from <paramref name="area"/> to the player in <paramref name="playerSlotIndex"/>.
+    /// </summary>
+    public static bool IsReachable(int playerSlotIndex, LG_Area area, GraphLayer layer = GraphLayer.Area, ReachableMode mode = ReachableMode.Traversable) => GetManager(layer).IsReachable(playerSlotIndex, area, mode);
+    /// <summary>
+    /// Gets whether there is an open path from <paramref name="zone"/> to the player in <paramref name="playerSlotIndex"/>.
+    /// </summary>
+    public static bool IsReachable(int playerSlotIndex, LG_Zone zone, ReachableMode mode = ReachableMode.Traversable) => GetManager(GraphLayer.Zone).IsReachable(playerSlotIndex, zone, mode);
     /// <summary>
     /// Gets whether there is an open path from <paramref name="courseNode"/> to any player.
     /// </summary>

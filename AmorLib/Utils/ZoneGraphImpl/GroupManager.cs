@@ -30,7 +30,7 @@ internal sealed class GroupManager<E> where E : GraphNode<E>
     public IReadOnlyCollection<E> Nodes => _idToNode.Values;
     public IReadOnlyDictionary<int, ushort> PlayerGroups => _playerToGroup;
 
-    public bool IsReachable(PlayerAgent player, int id) => _idToNode[id].IsReachable(_playerToGroup.GetValueOrDefault(player.PlayerSlotIndex));
+    public bool IsReachable(int playerSlotIndex, int id) => _idToNode[id].IsReachable(_playerToGroup.GetValueOrDefault(playerSlotIndex));
     public bool IsReachable(int id) => _idToNode[id].IsReachable();
 
     internal E GetNode(PlayerAgent player) => GetNode(player.CourseNode);

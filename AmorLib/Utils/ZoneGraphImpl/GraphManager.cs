@@ -75,11 +75,11 @@ internal abstract class GraphManager<T, E> : GraphManager
             _groupManagers[i] = new(layer, (ReachableMode)i);
     }
 
-    public override bool IsReachable(PlayerAgent player, int id, ReachableMode settings)
+    public override bool IsReachable(int playerSlotIndex, int id, ReachableMode settings)
     {
-        bool result = _groupManagers[(int)ReachableMode.Traversable].IsReachable(player, id);
+        bool result = _groupManagers[(int)ReachableMode.Traversable].IsReachable(playerSlotIndex, id);
         if (settings == ReachableMode.Changing)
-            result = result || _groupManagers[(int)ReachableMode.Changing].IsReachable(player, id);
+            result = result || _groupManagers[(int)ReachableMode.Changing].IsReachable(playerSlotIndex, id);
         return result;
     }
 
@@ -144,21 +144,21 @@ internal abstract class GraphManager
         _layer = layer;
     }
 
-    public abstract bool IsReachable(PlayerAgent player, int id, ReachableMode mode);
-    public bool IsReachable(PlayerAgent player, LG_Zone zone, ReachableMode mode) => IsReachable(player, zone.ID, mode);
-    public bool IsReachable(PlayerAgent player, LG_Area area, ReachableMode mode)
+    public abstract bool IsReachable(int playerSlotIndex, int id, ReachableMode mode);
+    public bool IsReachable(int playerSlotIndex, LG_Zone zone, ReachableMode mode) => IsReachable(playerSlotIndex, zone.ID, mode);
+    public bool IsReachable(int playerSlotIndex, LG_Area area, ReachableMode mode)
     {
         if (_layer == GraphLayer.Area)
-            return IsReachable(player, area.UID, mode);
+            return IsReachable(playerSlotIndex, area.UID, mode);
         else
-            return IsReachable(player, area.m_zone.ID, mode);
+            return IsReachable(playerSlotIndex, area.m_zone.ID, mode);
     }
-    public bool IsReachable(PlayerAgent player, AIG_CourseNode courseNode, ReachableMode mode)
+    public bool IsReachable(int playerSlotIndex, AIG_CourseNode courseNode, ReachableMode mode)
     {
         if (_layer == GraphLayer.Area)
-            return IsReachable(player, courseNode.m_area.UID, mode);
+            return IsReachable(playerSlotIndex, courseNode.m_area.UID, mode);
         else
-            return IsReachable(player, courseNode.m_zone.ID, mode);
+            return IsReachable(playerSlotIndex, courseNode.m_zone.ID, mode);
     }
 
     public abstract bool IsReachable(int id, ReachableMode mode);
