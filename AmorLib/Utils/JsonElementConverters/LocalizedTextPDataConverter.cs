@@ -8,11 +8,16 @@ namespace AmorLib.Utils.JsonElementConverters;
 
 public sealed class LocalizedTextPDataConverter : JsonConverter<LocalizedText>
 {
-    public override bool HandleNull => false;
+    public override bool HandleNull => true;
 
     public override LocalizedText Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.TokenType == JsonTokenType.String)
+        if (reader.TokenType == JsonTokenType.Null)
+        {
+            return new LocalizedText() { Id = 0, UntranslatedText = string.Empty };
+        }
+
+        else if (reader.TokenType == JsonTokenType.String)
         {
             var text = reader.GetString()!;
 
@@ -51,7 +56,7 @@ public sealed class LocalizedTextPDataConverter : JsonConverter<LocalizedText>
         }
         else
         {
-            JsonSerializer.Serialize(writer, value.UntranslatedText, options);
+            JsonSerializer.Serialize(writer, value.UntranslatedText ?? string.Empty, options);
         }
     }
 }
