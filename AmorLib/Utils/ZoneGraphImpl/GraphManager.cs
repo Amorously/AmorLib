@@ -75,18 +75,18 @@ internal abstract class GraphManager<T, E> : GraphManager
             _groupManagers[i] = new(layer, (ReachableMode)i);
     }
 
-    public override bool IsReachable(int playerSlotIndex, int id, ReachableMode settings)
+    public override bool IsReachable(int playerSlotIndex, int id, ReachableMode mode)
     {
         bool result = _groupManagers[(int)ReachableMode.Traversable].IsReachable(playerSlotIndex, id);
-        if (settings == ReachableMode.Changing)
+        if (mode == ReachableMode.Changing)
             result = result || _groupManagers[(int)ReachableMode.Changing].IsReachable(playerSlotIndex, id);
         return result;
     }
 
-    public override bool IsReachable(int id, ReachableMode settings)
+    public override bool IsReachable(int id, ReachableMode mode)
     {
         bool result = _groupManagers[(int)ReachableMode.Traversable].IsReachable(id);
-        if (settings == ReachableMode.Changing)
+        if (mode == ReachableMode.Changing)
             result = result || _groupManagers[(int)ReachableMode.Changing].IsReachable(id);
         return result;
     }

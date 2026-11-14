@@ -34,7 +34,7 @@ public sealed class ZoneGraphUtil // contributed by: Dinorush
 
     /// <summary>
     /// Callbacks that run whenever there is a change in reachability for a specific flag(s).
-    /// Index as <see cref="OnReachableTypeUpdate"/>[<see cref="ReachableMode"/> settings] to add/remove callbacks.
+    /// Index as <see cref="OnReachableTypeUpdate"/>[<see cref="ReachableMode"/> mode] to add/remove callbacks.
     /// </summary>
     public static readonly ReachableEvents OnReachableTypeUpdate = new();
 

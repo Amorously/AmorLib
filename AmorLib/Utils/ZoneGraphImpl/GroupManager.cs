@@ -21,10 +21,10 @@ internal sealed class GroupManager<E> where E : GraphNode<E>
         }
     }
 
-    public GroupManager(GraphLayer layer, ReachableMode settings)
+    public GroupManager(GraphLayer layer, ReachableMode mode)
     {
         _layer = layer;
-        _mode = settings;
+        _mode = mode;
     }
 
     public IReadOnlyCollection<E> Nodes => _idToNode.Values;
