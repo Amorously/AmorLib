@@ -50,6 +50,14 @@ public sealed class LocalizedTextPDataConverter : JsonConverter<LocalizedText>
 
     public override void Write(Utf8JsonWriter writer, LocalizedText value, JsonSerializerOptions options)
     {
+        // NOTE: must use 'is null' here. 'value == null' binds to the IL2CPP-generated
+        // LocalizedText.op_Equality, which dereferences the native pointer and throws.
+        if (value is null)
+        {
+            writer.WriteNullValue();
+            return;
+        }
+
         if (value.Id != 0)
         {
             JsonSerializer.Serialize(writer, value.Id, options); // TODO: write pdata GUID
